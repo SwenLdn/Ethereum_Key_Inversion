@@ -1,0 +1,100 @@
+import pandas as pd
+
+# Definition der konsolidierten Audit-Daten
+audit_data = [
+    # 1. EVM Payload & TX
+    {
+        "Sektion": "1. EVM Payload & TX",
+        "Parameter": "Hash (z)",
+        "Wert": "0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e",
+        "Bedeutung_Algebra": "Nachrichten-Digest z (256-Bit)",
+    },
+    {
+        "Sektion": "1. EVM Payload & TX",
+        "Parameter": "Signatur r",
+        "Wert": "0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e",
+        "Bedeutung_Algebra": "Kurvenpunkt x-Koordinate mod n",
+    },
+    {
+        "Sektion": "1. EVM Payload & TX",
+        "Parameter": "Signatur s",
+        "Wert": "0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663",
+        "Bedeutung_Algebra": "s = k^-1 * (z + r * d) mod n",
+    },
+    {
+        "Sektion": "1. EVM Payload & TX",
+        "Parameter": "Parität v",
+        "Wert": "0x26",
+        "Bedeutung_Algebra": "Dezimal 38 (rec_id = 1)",
+    },
+    # 2. ecrecover Rekonstruktion
+    {
+        "Sektion": "2. ecrecover Rekonstruktion",
+        "Parameter": "Public Key Q_x",
+        "Wert": "0xe2b0f474762fb5b0181ba42e14f754aa10bd8bf0f1add2795b62c7606557c5e4",
+        "Bedeutung_Algebra": "Q_x = (r^-1 * (s * R - z * G)).x",
+    },
+    {
+        "Sektion": "2. ecrecover Rekonstruktion",
+        "Parameter": "Public Key Q_y",
+        "Wert": "0x18f72d44e2a200603fad33cc0f96701ebcc30d203f7db971e44e18b62d1a2f19",
+        "Bedeutung_Algebra": "Q_y = (r^-1 * (s * R - z * G)).y",
+    },
+    {
+        "Sektion": "2. ecrecover Rekonstruktion",
+        "Parameter": "Sender-Adresse",
+        "Wert": "0xde07a47a39a3e4436376f0ca53e94d38108aefb2",
+        "Bedeutung_Algebra": "Keccak-256(Q_x || Q_y)[12:]",
+    },
+    # 3. Symmetrie-Gleichung
+    {
+        "Sektion": "3. Symmetrie-Gleichung",
+        "Parameter": "Linker Term (s * R - z * G)",
+        "Wert": "0xf996d3cda7d6e6c7694ae2d6b16b420242e12da809eac986136f98f524f2bce4...",
+        "Bedeutung_Algebra": "Elliptische Skalarmultiplikation & Subtraktion",
+    },
+    {
+        "Sektion": "3. Symmetrie-Gleichung",
+        "Parameter": "Rechter Term (r * Q)",
+        "Wert": "0xf996d3cda7d6e6c7694ae2d6b16b420242e12da809eac986136f98f524f2bce4...",
+        "Bedeutung_Algebra": "Skalarmultiplikation r * Q",
+    },
+    {
+        "Sektion": "3. Symmetrie-Gleichung",
+        "Parameter": "Symmetrie-Invarianz",
+        "Wert": "True (100.0%)",
+        "Bedeutung_Algebra": "s * R - z * G == r * Q (Phasenabgleich stabil)",
+    },
+    # 4. XOR-Schnittstellen
+    {
+        "Sektion": "4. XOR-Schnittstellen",
+        "Parameter": "Signatur-Kopplung (R ⊕ S)",
+        "Wert": "0x089792f0fbe16a78c021c7ec8bc67271bfc7cfe9b319503df002b7be6bf1a46d",
+        "Bedeutung_Algebra": "Bitweiser Phasenabgleich der Signaturschnittstellen",
+    },
+    {
+        "Sektion": "4. XOR-Schnittstellen",
+        "Parameter": "Public-Key-Kopplung (Q_x ⊕ Q_y)",
+        "Wert": "0xfa47d930948db5d027b697e21b6124b4ac7e86d0ced06b08bf2cdfd6484deafd",
+        "Bedeutung_Algebra": "Symmetrische Überlagerung der Kurvenkoordinaten",
+    },
+    {
+        "Sektion": "4. XOR-Schnittstellen",
+        "Parameter": "Gesamt-Symmetrie-Kopplung",
+        "Wert": "0xf2d04bc06f6cdfa8e797500e90a756c513b949397dc93b354f2e686823bc4e90",
+        "Bedeutung_Algebra": "R ⊕ S ⊕ Q_x ⊕ Q_y (Vollständiger Verbindungs-Vektor)",
+    },
+]
+
+# DataFrame instanziieren
+df_evm_summary = pd.DataFrame(audit_data)
+
+# Hierarchischen MultiIndex setzen
+df_evm_summary = df_evm_summary.set_index(["Sektion", "Parameter"])
+
+# Anzeigeoptionen für vollständige Spalteninhalte setzen
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_colwidth", None)
+
+print(df_evm_summary)
