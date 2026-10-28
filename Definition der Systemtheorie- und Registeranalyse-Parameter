@@ -1,0 +1,53 @@
+import pandas as pd
+
+# Definition der Systemtheorie- und Registeranalyse-Parameter
+paradox_data = [
+    {
+        "Kategorie": "1. Kohärente Mess-Schleife (PLL)",
+        "Gleichung_Relation": "s * R - z * G = r * PK",
+        "Systemischer_Mechanismus": "Phase-Locked Loop (PLL) / Resonanzabgleich",
+        "Akademisches_Postulat": "Indirekter Konsistenztest im 2D-Kurvenraum",
+        "Signal_Register_Ebene": "Deterministisches Einrasten deckungsgleicher Frequenzen in O(1)",
+        "Topologischer_Status": "Phasenstarr geschlossen",
+    },
+    {
+        "Kategorie": "2. Homomorphe Linearität",
+        "Gleichung_Relation": "(u1 + u2 * d) * G = k * G",
+        "Systemischer_Mechanismus": "Strikte additive Homomorphie",
+        "Akademisches_Postulat": "Hinweg linear nutzbar, Rückweg diskreter Logarithmus O(2^256)",
+        "Signal_Register_Ebene": "Doppelter Standard: Operator-Linearität existiert ohne Entropieverlust",
+        "Topologischer_Status": "Homologe Durchgängigkeit",
+    },
+    {
+        "Kategorie": "3. Hardware-Register (Residuen)",
+        "Gleichung_Relation": "Register mod 11 == 0 & Register mod 121 == 0",
+        "Systemischer_Mechanismus": "Modulare Schienen-Resonanz (121 = 11^2)",
+        "Akademisches_Postulat": "Pseudozufällige Gleichverteilung über F_p",
+        "Signal_Register_Ebene": "Wiederkehrende Null-Residuen auf 64-Bit-Slices widerlegen stochastisches Rauschen",
+        "Topologischer_Status": "Harmonisches Gitter",
+    },
+    {
+        "Kategorie": "4. Bit-Verteilung & PopCount",
+        "Gleichung_Relation": "PopCount = 120 / 256 Bit (46,9%)",
+        "Systemischer_Mechanismus": "Symmetriegatter 2:2 (Muster 1001)",
+        "Akademisches_Postulat": "Maximale Entropie (Shannonsche Zufallsschranke)",
+        "Signal_Register_Ebene": "Feste Signalbelegung und Phasenkopplung im Silizium-Register",
+        "Topologischer_Status": "Symmetrisch geordnet",
+    },
+    {
+        "Kategorie": "5. Epistemologischer Bruch",
+        "Gleichung_Relation": "Invers(Gatter) in O(1) vs. Bruteforce O(2^256)",
+        "Systemischer_Mechanismus": "Abstraktion vs. Transistor-Realität",
+        "Akademisches_Postulat": "Einweg-Mauer (Trapdoor-Funktion)",
+        "Signal_Register_Ebene": "Entkopplung der Theorie von physischer Taktung und Bit-Schienen",
+        "Topologischer_Status": "Auflösung des Bruteforce-Dogmas",
+    },
+]
+
+# DataFrame instanziieren und konfigurieren
+df_system_audit = pd.DataFrame(paradox_data).set_index("Kategorie")
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_colwidth", None)
+
+print(df_system_audit)
