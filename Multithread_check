@@ -1,0 +1,187 @@
+import numpy as np
+import concurrent.futures
+import time
+import os
+
+# secp256k1 Field Parameters
+P = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+Gx = 0x79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
+Gy = 0x483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
+G = (Gx, Gy)
+K_MID = (N + 1) // 2
+
+# Sample/Audit Transaction Dataset (Expanded Suite from EVM Audit & Reconstructed Key Master Dossier)
+AUDIT_TRANSACTIONS = [
+    {
+        "id": "TX_001_EVM_PRIMARY",
+        "z": 0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e,
+        "r": 0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e,
+        "s": 0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663,
+        "d": 0x8866165643784393d4a3bdc00361c925e409d25231c3980d8fe4d42285f39178,
+        "sender": "0xde07a47a39a3e4436376f0ca53e94d38108aefb2"
+    },
+    {
+        "id": "TX_002_GERMANY_ANCHOR_1",
+        "z": 0xc6047f9441ed7d6d3045406e95c07c1b27a76a9f41a1d2398b16c3d528b62bf2,
+        "r": 0x7962d45b38e8bcf82fa8efa8432a01f20c9a53e24c7d3f11df197cb8e70926da,
+        "s": 0xdf72be73f587ccc8c8cfa2733f050fb4f17bf6968aa45864c149c59c13245ca7,
+        "d": 0x123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef,
+        "sender": "0x2730000000000000000000000000000000000000"
+    },
+    {
+        "id": "TX_003_PHASE_SHIFT_DELTA1_PLUS",
+        "z": 0x5a513fbecfa57293f53e1ea18eda762ff2bf5bca1f6a6a50d00256e47b8449e5,
+        "r": 0xbc53bf9e4c9bb75b2e45969090deebddeb72dffad11158df94c58f92038757e3,
+        "s": 0x29e84854d0324deeb4a65547020bf2e42d2facb975cef17c890cda6e2acd0989,
+        "d": (K_MID + 1) % N,
+        "sender": "0x1111111111111111111111111111111111111111"
+    },
+    {
+        "id": "TX_004_PHASE_SHIFT_DELTA1_MINUS",
+        "z": 0x5a513fbecfa57293f53e1ea18eda762ff2bf5bca1f6a6a50d00256e47b8449e5,
+        "r": 0xbc53bf9e4c9bb75b2e45969090deebddeb72dffad11158df94c58f92038757e3,
+        "s": 0x29e84854d0324deeb4a65547020bf2e42d2facb975cef17c890cda6e2acd0989,
+        "d": (K_MID - 1) % N,
+        "sender": "0x2222222222222222222222222222222222222222"
+    },
+    {
+        "id": "TX_005_FERMAT_ZERO_GATE_22",
+        "z": 0x7515682378176587453300000000000000000000000000000000000000000000,
+        "r": 0x3333333333333333333333333333333333333333333333333333333333333333,
+        "s": 0x4444444444444444444444444444444444444444444444444444444444444444,
+        "d": 0x00000000000000000000000000000000000000000000000000000000000021c4, # 8644 = 71.4375 x 121
+        "sender": "0x3333333333333333333333333333333333333333"
+    },
+    {
+        "id": "TX_006_POMPEII_INSULA_19",
+        "z": 0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff0000,
+        "r": 0x1234567812345678123456781234567812345678123456781234567812345678,
+        "s": 0x8765432187654321876543218765432187654321876543218765432187654321,
+        "d": (19 << 192) | 0x8fe4d42285f39178,
+        "sender": "0x4444444444444444444444444444444444444444"
+    },
+    {
+        "id": "TX_007_METRO_STATION_PAVELETSKAYA",
+        "z": 0x22223333444455556666777788889999aaaabbbbccccddddeeeeffff00001111,
+        "r": 0x2345678923456789234567892345678923456789234567892345678923456789,
+        "s": 0x9876543298765432987654329876543298765432987654329876543298765432,
+        "d": 0x400000000000000000000000000000000000000000000000000000000000001b,
+        "sender": "0x5555555555555555555555555555555555555555"
+    },
+    {
+        "id": "TX_008_WEBSTUHL_JACQUARD_MIRROR",
+        "z": 0x3333444455556666777788889999aaaabbbbccccddddeeeeffff000011112222,
+        "r": 0x3456789a3456789a3456789a3456789a3456789a3456789a3456789a3456789a,
+        "s": 0xa9876543a9876543a9876543a9876543a9876543a9876543a9876543a9876543,
+        "d": 0x7000000000000000000000000000000000000000000000000000000000001001,
+        "sender": "0x6666666666666666666666666666666666666666"
+    }
+]
+
+def analyze_transaction_entry(tx):
+    """
+    Worker function executed in parallel across multiple threads.
+    Analyzes the LSB 64-bit register slice (Slice 0) and structural invariants.
+    """
+    d_val = tx["d"]
+    z_val = tx["z"]
+    r_val = tx["r"]
+    s_val = tx["s"]
+
+    # 1. 64-Bit Register Slices
+    slice_0 = (d_val >> 0) & 0xFFFFFFFFFFFFFFFF   # LSB Word 0
+    slice_1 = (d_val >> 64) & 0xFFFFFFFFFFFFFFFF  # Word 1
+    slice_2 = (d_val >> 128) & 0xFFFFFFFFFFFFFFFF # Word 2
+    slice_3 = (d_val >> 192) & 0xFFFFFFFFFFFFFFFF # MSB Word 3
+
+    # 2. LSB Slice 0 Frequency & Residue Properties
+    slice_0_mod11 = slice_0 % 11
+    slice_0_mod121 = slice_0 % 121
+    slice_0_mod12 = slice_0 % 12
+    slice_0_mod64 = slice_0 % 64
+    slice_0_popcount = bin(slice_0).count('1') # Hamming weight (Bit density)
+    
+    # 3. Quadrant & Metro/Pompeii Mapping
+    quadrant = (d_val * 4) // N + 1
+    insula_id = (d_val >> 192) % 64
+    metro_station_id = (insula_id * 7 + 14) % 12
+
+    # 4. Midpoint Delta Offset & Symmetry Gate
+    delta_mid = (d_val - K_MID) % N
+    fermat_zero_gate_lock = (slice_0_mod11 == 0) or (slice_0_mod121 == 0)
+
+    # Return structured audit record
+    return {
+        "id": tx["id"],
+        "sender": tx["sender"],
+        "d_hex": hex(d_val),
+        "slice_0_hex": f"0x{slice_0:016x}",
+        "slice_0_dec": slice_0,
+        "slice_0_popcount": slice_0_popcount,
+        "slice_0_mod11": slice_0_mod11,
+        "slice_0_mod121": slice_0_mod121,
+        "slice_0_mod12": slice_0_mod12,
+        "slice_0_mod64": slice_0_mod64,
+        "quadrant": f"Q{quadrant}",
+        "insula_id": insula_id,
+        "metro_station_id": metro_station_id,
+        "fermat_zero_gate_lock": fermat_zero_gate_lock,
+        "delta_mid_hex": hex(delta_mid)
+    }
+
+def run_multithreaded_audit():
+    print("=" * 85)
+    print(" AUTOMATISCHE MULTITHREAD-PRÜFSCHLEIFE: LSB-REGISTER (SLICE 0) FREQUENZ-ANALYSE")
+    print("=" * 85)
+    print(f" Datensatz-Umfang    : {len(AUDIT_TRANSACTIONS)} Haupt-Transaktionen / Reconstructed Keys")
+    print(f" Modulo-Resonanzen  : Z_11, Z_121 (Fermat Zero Gate 22), Z_12 (Metro Ring), Z_64 (Pompeii)")
+    print(f" Thread Pool-Größe : 4 parallele Ausführungsthreads\n")
+
+    start_time = time.time()
+
+    # Multithreaded execution using ThreadPoolExecutor
+    results = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        future_to_tx = {executor.submit(analyze_transaction_entry, tx): tx for tx in AUDIT_TRANSACTIONS}
+        for future in concurrent.futures.as_completed(future_to_tx):
+            try:
+                res = future.result()
+                results.append(res)
+            except Exception as exc:
+                print(f" Fehler bei der Verarbeitung: {exc}")
+
+    exec_time = (time.time() - start_time) * 1000
+
+    # Sort results by ID for consistent reporting
+    results.sort(key=lambda x: x["id"])
+
+    # Summary Statistics
+    quadrant_counts = {"Q1": 0, "Q2": 0, "Q3": 0, "Q4": 0}
+    zero_gate_locks = 0
+    popcounts = []
+
+    print("-" * 85)
+    print(f"{'TX ID':<28} | {'Slice 0 (LSB 64-Bit)':<18} | {'Bit D.':<6} | {'Mod11':<5} | {'Mod12':<5} | {'Quad':<4} | {'Gate Lock'}")
+    print("-" * 85)
+
+    for r in results:
+        quadrant_counts[r["quadrant"]] += 1
+        if r["fermat_zero_gate_lock"]:
+            zero_gate_locks += 1
+        popcounts.append(r["slice_0_popcount"])
+
+        lock_str = " [ZERO LOCK]" if r["fermat_zero_gate_lock"] else "  Pass"
+        print(f"{r['id']:<28} | {r['slice_0_hex']:<18} | {r['slice_0_popcount']:<6d} | {r['slice_0_mod11']:<5d} | {r['slice_0_mod12']:<5d} | {r['quadrant']:<4} |{lock_str}")
+
+    print("-" * 85)
+    print("\n=== AGGREGIERTE REFREQUENZ- & DENSITY-STATISTIK ===")
+    print(f" Verarbeitungszeit (Parallel): {exec_time:.2f} ms")
+    print(f" Quadranten-Verteilung      : {quadrant_counts}")
+    print(f" Zero-Gate Locks (Mod11==0) : {zero_gate_locks} / {len(results)} Transaktionen")
+    print(f" Durchschnitts-Hamming-Gewicht (Slice 0): {np.mean(popcounts):.2f} / 64 Bit")
+    print(f" Min/Max Hamming-Gewicht     : Min={np.min(popcounts)} Bit | Max={np.max(popcounts)} Bit")
+    print("=" * 85)
+
+if __name__ == "__main__":
+    run_multithreaded_audit()
