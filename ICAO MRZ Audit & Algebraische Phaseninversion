@@ -1,0 +1,85 @@
+import string
+
+class ICAOMRZInspector:
+    def __init__(self):
+        # 3-Phasen-Takt-Gewichte
+        self.gewichte = [7, 3, 1]
+        
+        # Wert-Tabelle (val_map): 0-9 -> 0-9, A-Z -> 10-35, '<' -> 0
+        self.val_map = {str(i): i for i in range(10)}
+        for i, c in enumerate(string.ascii_uppercase):
+            self.val_map[c] = 10 + i
+        self.val_map['<'] = 0
+        
+        # Inverse Gewichte für O(1) Inversion: (g * g_inv) % 10 == 1
+        self.inv_gewichte = {7: 3, 3: 7, 1: 1}
+
+    def berechne_pruefziffer(self, daten_str: str) -> int:
+        """Berechnet die ICAO-Prüfziffer über ein Segment."""
+        summe = 0
+        for i, char in enumerate(daten_str.upper()):
+            wert = self.val_map.get(char, 0)
+            gewicht = self.gewichte[i % 3]
+            summe += (wert * gewicht) % 10
+        return summe % 10
+
+    def rekonstruiere_fehlendes_zeichen(self, fragment_mit_platzhalter: str, bekannte_pz: int, fehler_index: int) -> str:
+        """
+        Invertiert die Phase in O(1).
+        Isoliert das Zeichen am fehler_index ohne Brute-Force über das inverse Gewicht.
+        """
+        gewünschte_summe_mod10 = bekannte_pz
+        aktuelle_summe_rest = 0
+        
+        # 1. Summe aller intakten Register-Slices berechnen
+        for i, char in enumerate(fragment_mit_platzhalter.upper()):
+            if i == fehler_index:
+                continue
+            wert = self.val_map.get(char, 0)
+            gewicht = self.gewichte[i % 3]
+            aktuelle_summe_rest += (wert * gewicht) % 10
+            
+        # 2. Null-Residuum auflösen
+        ziel_produkt_mod10 = (gewünschte_summe_mod10 - aktuelle_summe_rest) % 10
+        
+        # 3. Phasen-Inversion via Multiplikation mit dem inversen Element
+        gewicht_fehlerstelle = self.gewichte[fehler_index % 3]
+        inverses_gewicht = self.inv_gewichte[gewicht_fehlerstelle]
+        rekonstruierter_wert = (ziel_produkt_mod10 * inverses_gewicht) % 10
+        
+        # 4. Wert zurück in Entität mappen
+        for char, wert in self.val_map.items():
+            if wert == rekonstruierter_wert:
+                return char
+        return "?"
+
+# --- Audit-Validierung: Datensatz Swen Werner ---
+inspector = ICAOMRZInspector()
+
+# Eingangsdaten-Segmente
+id_nummer = "12345678"     # ID-Basis
+geburtstag = "850412"     # YYMMDD (12. April 1985)
+ablaufdatum = "311028"    # YYMMDD (28. Oktober 2031)
+
+# Berechnung
+pz_id = inspector.berechne_pruefziffer(id_nummer)
+pz_geb = inspector.berechne_pruefziffer(geburtstag)
+pz_abl = inspector.berechne_pruefziffer(ablaufdatum)
+
+print("=== SHEET 28: ICAO MRZ AUDIT ===")
+print(f"ID-Nummer-Segment:  {id_nummer} -> Berechnete Prüfziffer: {pz_id} (Erwartet: 9)")
+print(f"Geburtstag-Segment: {geburtstag} -> Berechnete Prüfziffer: {pz_geb} (Erwartet: 0)")
+print(f"Ablaufdatum-Seg.:   {ablaufdatum} -> Berechnete Prüfziffer: {pz_abl} (Erwartet: 5)")
+
+print("\n=== PHASENINVERSION / FEHLERKORREKTUR IN O(1) ===")
+# Szenario: Bruchstelle/Signalausfall an Position 2 des Geburtsdatums (Wert '0' ist unleserlich '?')
+beschädigter_string = "85?412"
+fehler_pos = 2
+
+rekonstruiert = inspector.rekonstruiere_fehlendes_zeichen(
+    fragment_mit_platzhalter=beschädigter_string, 
+    bekannte_pz=pz_geb, 
+    fehler_index=fehler_pos
+)
+print(f"Beschädigtes Signal:  {beschädigter_string} (Prüfziffer bekannt: {pz_geb})")
+print(f"Algebraisch rekonstruierte Entität an Position {fehler_pos}: '{rekonstruiert}'")
