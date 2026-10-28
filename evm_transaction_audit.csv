@@ -1,0 +1,13 @@
+Sektion,Parameter,Wert_Hex,Bedeutung_Algebra,Registerbreite,Komplexitaet
+1. EVM Payload & TX,Hash (z),0xeba2df809e7a612a0a0d444ccfa5c839624bdc00dd29e3340d46df3870f8a30e,Nachrichten-Digest z,32 Byte (256 Bit),O(1)
+1. EVM Payload & TX,Signatur r,0x223a7c9bcf5531c99be5ea7082183816eb20cfe0bbc322e97cc5c7f71ab8b20e,Kurvenpunkt x-Koordinate mod n,32 Byte (256 Bit),O(1)
+1. EVM Payload & TX,Signatur s,0x2aadee6b34b45bb15bc42d9c09de4a6754e7000908da72d48cc7704971491663,s = k^-1 * (z + r * d) mod n,32 Byte (256 Bit),O(1)
+1. EVM Payload & TX,Paritaet v,0x26,Dezimal 38 -> rec_id = 1 (Odd/Even Y + ChainID),1 Byte (8 Bit),O(1)
+1. EVM Payload & TX,Nonce,0x0,Transaktionszaehler des Kontos,Variable,O(1)
+1. EVM Payload & TX,To / Recipient,0x07a565b7ed7d7a678680a4c162885bedbb695fe0,Zieladresse 160-Bit,20 Byte (160 Bit),O(1)
+2. ecrecover Rekonstruktion,Public Key Q_x,0xe2b0f474762fb5b0181ba42e14f754aa10bd8bf0f1add2795b62c7606557c5e4,Q_x = (r^-1 * (s*R - z*G)).x,32 Byte (256 Bit),O(1)
+2. ecrecover Rekonstruktion,Public Key Q_y,0x18f72d44e2a200603fad33cc0f96701ebcc30d203f7db971e44e18b62d1a2f19,Q_y = (r^-1 * (s*R - z*G)).y,32 Byte (256 Bit),O(1)
+2. ecrecover Rekonstruktion,Sender Address,0xde07a47a39a3e4436376f0ca53e94d38108aefb2,Keccak-256(Q_x || Q_y)[12:],20 Byte (160 Bit),O(1)
+3. Symmetrie-Gleichung,Linker Term (s*R - z*G),0xf996d3cda7d6e6c7694ae2d6b16b420242e12da809eac986136f98f524f2bce4...,Elliptische Kurven-Skalarmultiplikation & Subtraktion,64 Byte Koordinate,O(1)
+3. Symmetrie-Gleichung,Rechter Term (r*Q),0xf996d3cda7d6e6c7694ae2d6b16b420242e12da809eac986136f98f524f2bce4...,Skalarmultiplikation r * Public Key Q,64 Byte Koordinate,O(1)
+3. Symmetrie-Gleichung,Symmetrie-Invarianz,True (Identitaet 100.0%),s*R - z*G == r*Q (Phasenabgleich verifiziert),1 Bit,O(1)
