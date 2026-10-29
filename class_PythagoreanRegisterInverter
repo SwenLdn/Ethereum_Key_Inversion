@@ -1,0 +1,110 @@
+import math
+import numpy as np
+
+class PythagoreanRegisterInverter:
+    """
+    Klasse zur Umrechnung der pythagoreischen Register-Geometrie 
+    (a^2 + b^2 = c^2, Produkt-Summen-Kopplung und 7-Zeilen-Matrix-Shift).
+    """
+    def __init__(self, a=5, b=12):
+        self.a = a
+        self.b = b
+        self.c = math.isqrt(a**2 + b**2)
+        
+    def product_sum_invariants(self, pairs):
+        """
+        Berechnet die unumstößliche Produkt-Summen-Kopplung:
+        Product (x * y), Sum (x + y), Delta (x * y - (x + y))
+        """
+        results = []
+        for x, y in pairs:
+            prod = x * y
+            s = x + y
+            delta = prod - s
+            results.append({
+                "pair": (x, y),
+                "product": prod,
+                "sum": s,
+                "delta": delta
+            })
+        return results
+
+    def project_pythagorean_hypotenuse(self, eth_address_dec):
+        """
+        Projiziert die 48-stellige Adresse über die Hypotenuse c = 13
+        und prüft das 91er-Phasen-Gatter (7 * 13 = 91).
+        """
+        mod13 = eth_address_dec % self.c
+        mod91 = eth_address_dec % (7 * self.c)
+        
+        # Schienen-Shift Delta
+        q = eth_address_dec // self.c
+        shift_delta = q % 7
+        
+        return {
+            "hypotenuse_c": self.c,
+            "mod_13_zero_check": mod13 == 0,
+            "mod_91_phase": mod91,
+            "shift_delta": shift_delta,
+            "is_interlocked": (mod13 == 0) and (shift_delta == 1)
+        }
+
+    def build_7row_matrix_vector(self, hex_stream):
+        """
+        Baut das 7-Zeilen / 8-Byte (64-Bit) Vektor-Raster auf
+        und visualisiert die Diagonale von 0 -> 4 bei 7 Zeilen.
+        """
+        clean_hex = hex_stream.replace("0x", "").lower().zfill(128)
+        bytes_array = [clean_hex[i:i+2] for i in range(0, len(clean_hex), 2)]
+        
+        rows = []
+        for r in range(8):
+            row_bytes = bytes_array[r*8:(r+1)*8]
+            rows.append(row_bytes)
+            
+        return rows
+
+def run_demonstration():
+    print("=================================================================")
+    print(" PYTHAGOREAN REGISTER INVERSION: PYTHON-FORMELN-UMSETZUNG")
+    print("=================================================================")
+    
+    inverter = PythagoreanRegisterInverter(a=5, b=12)
+    
+    # 1. Produkt-Summen-Kopplungs-Tabelle
+    pairs = [(2, 3), (2, 7), (4, 7), (3, 9), (3, 4)]
+    invariants = inverter.product_sum_invariants(pairs)
+    
+    print("\n1. Produkt- vs. Summen-Invarianz:")
+    for item in invariants:
+        x, y = item["pair"]
+        print(f"   ({x} x {y} = {item['product']:2d})  vs.  ({x} + {y} = {item['sum']:2d})  -->  Delta = {item['delta']:2d}")
+        
+    print(f"\n2. Pythagoreische Vektor-Hypotenuse:")
+    print(f"   a^2 + b^2 = {inverter.a}^2 + {inverter.b}^2 = {inverter.a**2} + {inverter.b**2} = {inverter.a**2 + inverter.b**2}")
+    print(f"   c = sqrt(169) = {inverter.c}  (13er Prim-Anker)")
+    
+    # 3. Adress-Projektion über die 13er-Hypotenuse
+    eth_address_dec = 280696729256414942963961162280862002742902866446
+    proj = inverter.project_pythagorean_hypotenuse(eth_address_dec)
+    
+    print(f"\n3. Adress-Projektion am 13er-Hypotenusen-Gatter:")
+    print(f"   Adresse Decimal          : {eth_address_dec}")
+    print(f"   Hypotenusen-Anker (c)     : {proj['hypotenuse_c']}")
+    print(f"   Restlos durch 13 teilbar  : {proj['mod_13_zero_check']}")
+    print(f"   91er-Phasen-Gatter (mod 91): {proj['mod_91_phase']} (Hex: {hex(proj['mod_91_phase'])})")
+    print(f"   Schienen-Shift (q mod 7)  : +{proj['shift_delta']} (Delta = +1 Shift)")
+    print(f"   System Phase Interlocked : {proj['is_interlocked']}")
+    
+    # 4. Matrix-Vektor-Gitter
+    sample_hex = "1234567890123456789012345678901234567890123456789012345678901234"
+    grid = inverter.build_7row_matrix_vector(sample_hex)
+    
+    print(f"\n4. 7-Zeilen / 8-Byte Register-Raster (Matrix-Slices):")
+    for idx, row in enumerate(grid):
+        print(f"   Zeile {idx}: " + " ".join(row))
+        
+    print("=================================================================")
+
+if __name__ == "__main__":
+    run_demonstration()
