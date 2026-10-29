@@ -1,0 +1,48 @@
+import pandas as pd
+
+governance_levels = [
+    # 1. Makroebene: Notenbank / EZB (Fiduziarisches System & Priesterschaft)
+    {
+        "System_Ebene": "1. Makro / Supranational (EZB)",
+        "Strukturelle_Funktion": "Fiduziarischer Vertrauensanker (Priesterschaft)",
+        "Systemischer_Mechanismus": "Transubstantiation der Gesamtschuld; unteilbare, nicht delegierbare Verantwortung an der Spitze ohne Rückfallebene",
+        "Fehlallokation_Perversion": "Korsett institutioneller Neutralität vs. Realitätsdissonanz (z. B. Digitaler Euro vs. Krypto-Fragilität)",
+        "Phasengeometrie_Operator": "Singulärer Kollaps: Sündenbock-Opferung bei Vertrauensverlust (keine höhere Instanz/Kanzler greifbar)",
+        "Formale_Gleichung_Dynamik": "U(Institution) = P(Glaube); d(Schuld)/d(Hierarchie) = 0",
+    },
+    # 2. Mesoebene: Investment Banking & Corporate Governance
+    {
+        "System_Ebene": "2. Meso / Banken-Governance (Vorstand)",
+        "Strukturelle_Funktion": "Risikoallokation & Strategische Richtungsentscheidung",
+        "Systemischer_Mechanismus": "Verantwortungsdiffusion via Bürokratiekaskade ('Ich sage Ja, wenn du ein Memo schreibst und keiner Nein sagt')",
+        "Fehlallokation_Perversion": "Entscheidungsverweigerung; P&L-Arbitrage durch Senior-Rotation alle 18–24 Monate vor Eintreffen der Latenzschäden",
+        "Phasengeometrie_Operator": "Temporale Entkopplung: Rotationstaktung (2 J.) < Schadenslatenz (3–5 J.); Sanierung der Vorgängerfehler als Schein-Held",
+        "Formale_Gleichung_Dynamik": "Karriere = max(Diffusion); Risiko(Individuum) -> 0 via n-Sign-offs",
+    },
+    # 3. Mikroebene: Entscheidungstheorie & Incentive-Architektur
+    {
+        "System_Ebene": "3. Mikro / Entscheidungstheorie & Incentives",
+        "Strukturelle_Funktion": "Entscheiden unter echter Unsicherheit",
+        "Systemischer_Mechanismus": "Outcome Bias & 'Head of Glücksspiel': Belohnung von stochastischem Zufall/Glücksrad statt Prozessqualität",
+        "Fehlallokation_Perversion": "Naive Scheinalternativen ('A oder B?') statt bedingter Funktion f(x, t, constraints) mit invarianten Kerninhalten",
+        "Phasengeometrie_Operator": "Verwechselung von stochastischem Rauschen mit Führungsleistung; KPI-Manipulation nach Goodhart's Law",
+        "Formale_Gleichung_Dynamik": "Bonus = f(Zufall); Bestrafung(Fehlentscheidung) = Willkür; Prozessgüte = 0 bepreist",
+    },
+    # 4. Metaebene: Machtökonomie (Machiavelli-Inversion)
+    {
+        "System_Ebene": "4. Meta / Machtarchitektur (Machiavelli-Inversion)",
+        "Strukturelle_Funktion": "Monopolisierung von Steuerungs- und Rettungsnarrativen",
+        "Systemischer_Mechanismus": "Macht durch Problemverwaltung: Status X (super) wird flankiert durch Problem Y, beherrscht nur durch Eigenmarke/Programm Z",
+        "Fehlallokation_Perversion": "Echte Problemlösung von Y setzt Z auf Wert 0 -> Zerstörung des persönlichen Budgets/Brands; Problemlöser = Feind",
+        "Phasengeometrie_Operator": "Homöostatische Selbsterhaltung: System wehrt deterministische Lösungen ab, um Steuerungsapparat Z zu schützen",
+        "Formale_Gleichung_Dynamik": "Wert(Z) ∝ Fortbestand(Y); Wenn Y -> 0, dann Wert(Z) = 0 (Existenzbedrohung für Bürokratie)",
+    },
+]
+
+df_governance = pd.DataFrame(governance_levels).set_index("System_Ebene")
+
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_colwidth", None)
+
+print(df_governance)
