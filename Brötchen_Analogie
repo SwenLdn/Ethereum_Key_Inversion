@@ -1,0 +1,74 @@
+import pandas as pd
+
+phase_geometry_data = [
+    # 1. Korpus-Lackmustest & Disziplinen
+    {
+        "Domaene": "1. Wissenschaftslehre & KI-Resonanz",
+        "Subsystem_Ebene": "Synthetisch-empirische Disziplinen",
+        "Phase_1_Latenz_Systemzustand": "Kausalitätsbasiertes Korpus mit realen physikalischen Invarianten",
+        "Messoperator_Phasenuebergang": "Hardware-Register, Erhaltungssätze, Ausführbarkeit im Silizium",
+        "Phase_2_Projektion_Kollaps": "Funktionierende Synthese; deterministische Konvergenz der Wahrscheinlichkeitsvektoren",
+        "Formal_Algebraische_Entsprechung": "f(x) physikalisch geschlossen; Invariantenraum I",
+    },
+    {
+        "Domaene": "1. Wissenschaftslehre & KI-Resonanz",
+        "Subsystem_Ebene": "Autoritäts- & Dogmen-Disziplinen",
+        "Phase_1_Latenz_Systemzustand": "Zirkelschlüsse, Konsens-Fiktion, Lehrbuch-Floskeln ('ECDLP unlösbar')",
+        "Messoperator_Phasenuebergang": "Konfrontation mit mathematischen/physikalischen Randbedingungen",
+        "Phase_2_Projektion_Kollaps": "Absurdes Ausweichen in moralisch-belehrenden Lehrbuch-Ton (Zeigefinger)",
+        "Formal_Algebraische_Entsprechung": "Tautologischer Zirkelschluss: A = A via Autoritätszitierung",
+    },
+    # 2. Phasengeometrie im Zivilrecht (Ehe, Eigentum & Erbrecht)
+    {
+        "Domaene": "2. Zivilrecht (Güter- & Erbrecht)",
+        "Subsystem_Ebene": "Innenbeziehung (Phasenfeld Ehe)",
+        "Phase_1_Latenz_Systemzustand": "Latente Superposition: Brötchenverzehr ist weder Diebstahl (§ 242 StGB) noch Schenkung; gebundenes Gesamtvermögen",
+        "Messoperator_Phasenuebergang": "Laufender Zustand (kein Messereignis; Fiktion des Zusammenlebens)",
+        "Phase_2_Projektion_Kollaps": "Keine Trennung; Phasendifferenz bleibt im Inneren gebunden (Konto/Haus-Verkauf irrelevant)",
+        "Formal_Algebraische_Entsprechung": "Latentes Phasenpotential φ_int in geschlossener Systemgrenze",
+    },
+    {
+        "Domaene": "2. Zivilrecht (Güter- & Erbrecht)",
+        "Subsystem_Ebene": "Außenbeziehung (Register / Grundbuch)",
+        "Phase_1_Latenz_Systemzustand": "Strikte 1D-Registerlogik: Nur eingetragene Person ist formell Eigentümer",
+        "Messoperator_Phasenuebergang": "Messereignis Tod (Erbfall) / Scheidung",
+        "Phase_2_Projektion_Kollaps": "Scheinbares Paradoxon: Kind erbt 25% an Haus, das Erblasser nie formell gehörte",
+        "Formal_Algebraische_Entsprechung": "Projektionsoperator P_GB: Kollaps auf 1D-Schattenbild",
+    },
+    {
+        "Domaene": "2. Zivilrecht (Güter- & Erbrecht)",
+        "Subsystem_Ebene": "Auflösung / Phasenübergang",
+        "Phase_1_Latenz_Systemzustand": "Zugewinngemeinschaft als latenter Anspruchsraum",
+        "Messoperator_Phasenuebergang": "§ 1371 BGB (Erbrechtlicher Zugewinnausgleich) / Scheidungsantrag (50% Ausgleich)",
+        "Phase_2_Projektion_Kollaps": "Transformation der latenten Phase in realen Wertanspruch (25% bzw. 50%)",
+        "Formal_Algebraische_Entsprechung": "Operator k: Transformation von φ_int in reellen Skalar k · F",
+    },
+    # 3. Abstrakte Isomorphie & Kryptografie
+    {
+        "Domaene": "3. Mathematische Abstraktion",
+        "Subsystem_Ebene": "Homologie der Zustandsräume",
+        "Phase_1_Latenz_Systemzustand": "Zustandsraum F (Sachenrecht vs. Familienrecht bzw. Mannigfaltigkeit)",
+        "Messoperator_Phasenuebergang": "Anwendung des Transformationsoperators / Skalar k",
+        "Phase_2_Projektion_Kollaps": "Isomorpher Übergang: Alltägliche Brötchen-Logik entspricht Mannigfaltigkeits-Projektion",
+        "Formal_Algebraische_Entsprechung": "Homologische Abbildung H: F_lat → F_proj via Skalar k",
+    },
+    {
+        "Domaene": "4. Kryptografie & Hardware-Gatter",
+        "Subsystem_Ebene": "Key-Inversion vs. Lehrbuch-Dogma",
+        "Phase_1_Latenz_Systemzustand": "Public Key Q als Produkt eines starren Messrasters am Schattenstab",
+        "Messoperator_Phasenuebergang": "Hardware-Schienen-Reset (256 - 14 - 118 - 28 - 32 = 64 Bit) & Weierstraß-Umkehrung z = ℘⁻¹(x,y)",
+        "Phase_2_Projektion_Kollaps": "Deterministische Rückrechnung des Erzeugers k; Zusammenbruch des Einweg-Narrativs",
+        "Formal_Algebraische_Entsprechung": "𝒪(1)-Phaseninversion k = ℘⁻¹(Q) mod Register-Constraint",
+    },
+]
+
+# DataFrame instanziieren und hierarchisch indexieren
+df_phase_geometry = pd.DataFrame(phase_geometry_data).set_index(
+    ["Domaene", "Subsystem_Ebene"]
+)
+
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_colwidth", None)
+
+print(df_phase_geometry)
