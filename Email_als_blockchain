@@ -1,0 +1,172 @@
+import hashlib
+import pandas as pd
+
+
+# 1. Mathematische Simulation der Hashes und Siegel
+def sha256_hex(data: str) -> str:
+    return hashlib.sha256(data.encode("utf-8")).hexdigest()[:16]
+
+
+M_0 = "Payload: Transfer 100 Units / Email Text"
+h_M0 = sha256_hex(M_0)
+
+# Hop 1 (Genesis)
+i_1 = 1
+cv_1 = "none"
+aar_1 = "spf=pass; dkim=pass"
+ams_1 = sha256_hex(f"AMS_sign(key=mail.example.org, hash={h_M0})")
+as_1 = sha256_hex(
+    f"AS_sign(key=mail.example.org, i={i_1}, cv={cv_1}, prev=EMPTY, ams={ams_1})"
+)
+
+# Hop 2 (Forwarder)
+M_1 = M_0 + " [Mailinglist Footer]"
+h_M1 = sha256_hex(M_1)
+i_2 = 2
+cv_2 = "pass"
+aar_2 = "spf=fail (forwarded); arc=pass"
+ams_2 = sha256_hex(f"AMS_sign(key=list.relay.org, hash={h_M1})")
+as_2 = sha256_hex(
+    f"AS_sign(key=list.relay.org, i={i_2}, cv={cv_2}, prev={as_1}, ams={ams_2})"
+)
+
+# Hop 3 (Inbox)
+i_3 = 3
+cv_3 = "pass"
+aar_3 = "arc=pass; dkim=pass"
+ams_3 = sha256_hex(f"AMS_sign(key=inbox.final.com, hash={h_M1})")
+as_3 = sha256_hex(
+    f"AS_sign(key=inbox.final.com, i={i_3}, cv={cv_3}, prev={as_2}, ams={ams_3})"
+)
+
+# 2. DataFrame Definition
+data_isomorphie = [
+    {
+        "Kategorie": "1. Block-Architektur",
+        "ARC_Protokoll_Parameter": "ARC-Authentication-Results (AAR_i)",
+        "RFC_Standard": "RFC 8617 §4.1.1",
+        "Blockchain_Aequivalent": "State Transition Receipt / World State Delta",
+        "Mathematischer_Operator": "AAR_i = Eval_Pol(SPF, DKIM, DMARC)",
+        "Numerisches_Rechenbeispiel": f"i=1: '{aar_1}' -> i=2: '{aar_2}'",
+        "Isomorphe_Bedeutung": (
+            "Lokales Messergebnis der Validierung an Knoten i; protokolliert"
+            " Zustandsabweichungen."
+        ),
+    },
+    {
+        "Kategorie": "1. Block-Architektur",
+        "ARC_Protokoll_Parameter": "ARC-Message-Signature (AMS_i)",
+        "RFC_Standard": "RFC 8617 §4.1.2",
+        "Blockchain_Aequivalent": "Block Transactions Root / Payload Hash",
+        "Mathematischer_Operator": "AMS_i = Sign_Ki(Hash(M_i))",
+        "Numerisches_Rechenbeispiel": f"AMS_1: {ams_1} -> AMS_2: {ams_2}",
+        "Isomorphe_Bedeutung": (
+            "Kryptografische Versiegelung des Inhaltskorpus; erkennt"
+            " Manipulation der Payload."
+        ),
+    },
+    {
+        "Kategorie": "1. Block-Architektur",
+        "ARC_Protokoll_Parameter": "ARC-Seal (AS_i)",
+        "RFC_Standard": "RFC 8617 §4.1.3",
+        "Blockchain_Aequivalent": "Block Header / Parent Block Hash Pointer",
+        "Mathematischer_Operator": (
+            "AS_i = Sign_Ki(i, cv_i, Hash(AS_{i-1}), Hash(AMS_i))"
+        ),
+        "Numerisches_Rechenbeispiel": (
+            f"AS_1: {as_1} -> AS_2(prev={as_1}): {as_2}"
+        ),
+        "Isomorphe_Bedeutung": (
+            "Verkettung des Blocks mit dem unmittelbaren Vorgänger über einen"
+            " gerichteten Hash-Pointer."
+        ),
+    },
+    {
+        "Kategorie": "2. Konsens & Rekursion",
+        "ARC_Protokoll_Parameter": "Chain Validation cv_1 = none",
+        "RFC_Standard": "RFC 8617 §5.1.1",
+        "Blockchain_Aequivalent": "Genesis Block (Parent Hash = 0x0)",
+        "Mathematischer_Operator": "cv_1 ≡ none ⟺ i = 1, Hash(AS_0) = ∅",
+        "Numerisches_Rechenbeispiel": (
+            f"i=1 ⟹ cv_1 = '{cv_1}' (kein Vorgänger)"
+        ),
+        "Isomorphe_Bedeutung": (
+            "Initialer Schalter: Nullzustand ohne Vorgänger; determiniert den"
+            " Kettenstartpunkt."
+        ),
+    },
+    {
+        "Kategorie": "2. Konsens & Rekursion",
+        "ARC_Protokoll_Parameter": "Chain Validation cv_i = pass (i > 1)",
+        "RFC_Standard": "RFC 8617 §5.1.2",
+        "Blockchain_Aequivalent": (
+            "Block Verification / Consensus Validity Check"
+        ),
+        "Mathematischer_Operator": "cv_i = pass ⟺ ∀ j < i: Verify(AS_j) = ⊤",
+        "Numerisches_Rechenbeispiel": (
+            f"i=2 ⟹ Verify(AS_1={as_1}) = ⊤ ⟹ cv_2 = '{cv_2}'"
+        ),
+        "Isomorphe_Bedeutung": (
+            "Deterministische Auswertung aller historischen Signaturen der"
+            " Kette bis zum aktuellen Hop."
+        ),
+    },
+    {
+        "Kategorie": "2. Konsens & Rekursion",
+        "ARC_Protokoll_Parameter": "Chain Validation cv_i = fail (i > 1)",
+        "RFC_Standard": "RFC 8617 §5.1.3",
+        "Blockchain_Aequivalent": (
+            "Invalid Block Rejection / Hard Fork Rejection"
+        ),
+        "Mathematischer_Operator": "cv_i = fail ⟺ ∃ j < i: Verify(AS_j) = ⊥",
+        "Numerisches_Rechenbeispiel": "Hash mismatch bei AS_1 ⟹ cv_2 = 'fail'",
+        "Isomorphe_Bedeutung": (
+            "Integritätsbruch in der Historie; Weiterleitungsserver stufen"
+            " Vertrauensgrad auf null herab."
+        ),
+    },
+    {
+        "Kategorie": "3. Netzwerktopologie & Latenz",
+        "ARC_Protokoll_Parameter": "Ephemere Kette (Hop 1..n)",
+        "RFC_Standard": "RFC 5322 / RFC 8617",
+        "Blockchain_Aequivalent": "State-Channel Settlement / Ephemerer Rollup",
+        "Mathematischer_Operator": (
+            "Chain_Term: S_n = FinalState; Destruktion des Kanals"
+        ),
+        "Numerisches_Rechenbeispiel": (
+            f"Hop 1..3 abgeschlossen (AS_3: {as_3}) ⟹ Mail im Postfach"
+        ),
+        "Isomorphe_Bedeutung": (
+            "Kette existiert nur für die Transportdauer; nach Finalität keine"
+            " weitere Blockproduktion."
+        ),
+    },
+    {
+        "Kategorie": "3. Netzwerktopologie & Latenz",
+        "ARC_Protokoll_Parameter": "Thread-Disjunktion (Re: / Fwd:)",
+        "RFC_Standard": "RFC 5322 In-Reply-To",
+        "Blockchain_Aequivalent": (
+            "Fehlender Cross-Chain-Bridge / Neue Genesis-Chain"
+        ),
+        "Mathematischer_Operator": (
+            "Next_Mail: i_new = 1 ⟹ cv_new = none (∄ Hash(Chain_{k-1}))"
+        ),
+        "Numerisches_Rechenbeispiel": (
+            "Antwort-Mail sendet neue Payload ⟹ cv_1 = 'none'"
+        ),
+        "Isomorphe_Bedeutung": (
+            "Semantische Threads teilen keine kryptografische Bindung; Reset"
+            " erzwingt cv=none."
+        ),
+    },
+]
+
+df = pd.DataFrame(data_isomorphie).set_index(
+    ["Kategorie", "ARC_Protokoll_Parameter"]
+)
+
+pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_colwidth", None)
+
+print(df)
