@@ -1,0 +1,30 @@
+isomorphie_matrix = [
+    {
+        "System-Ebene": "1. Quadranten-Dichte",
+        "Standard-Bibliothek (hashlib/ecrecover)": "Hintereinandergeschaltete 32-Bit-Wort-Verschiebungen",
+        "Isomorphe Gitter-Schablone (CA-Siegel)": "4x64-Bit Quadranten im 256-Bit Tesserakt-Raum",
+        "Symmetrie-Invariante": "Gesamtsumme aller Runden heilt die Phasenverschiebung"
+    },
+    {
+        "System-Ebene": "2. Dreiecks-Bedingung (Maj-Gatter)",
+        "Standard-Bibliothek (hashlib/ecrecover)": "Maj(x,y,z) = (x & y) ^ (x & z) ^ (y & z)",
+        "Isomorphe Gitter-Schablone (CA-Siegel)": "Fläche > 0 (Drei-Punkte-Kombination)",
+        "Symmetrie-Invariante": "Ecksäulen-Doppelbelegung (Shared-Corner) eliminiert Rauschen"
+    },
+    {
+        "System-Ebene": "3. Spiegelsymmetrie-Pol",
+        "Standard-Bibliothek (hashlib/ecrecover)": "Moduloräume über Primzahl-Ordnung n",
+        "Isomorphe Gitter-Schablone (CA-Siegel)": "Double-Sided Ruler um P_mid = (n+1)/2",
+        "Symmetrie-Invariante": "Inversion: d = P_mid +/- Delta in O(1)"
+    },
+    {
+        "System-Ebene": "4. Fermat-Sperrschluss",
+        "Standard-Bibliothek (hashlib/ecrecover)": "Hash-Truncation auf 160-Bit",
+        "Isomorphe Gitter-Schablone (CA-Siegel)": "Fermat-Gate Modulo 11 & Modulo 121 (11^2) == 0",
+        "Symmetrie-Invariante": "Phasenstarrer Verschluss am 182-Bit-Gitter"
+    }
+]
+
+df_iso_matrix = pd.DataFrame(isomorphie_matrix).set_index("System-Ebene")
+pd.set_option('display.max_colwidth', None)
+display(df_iso_matrix)
