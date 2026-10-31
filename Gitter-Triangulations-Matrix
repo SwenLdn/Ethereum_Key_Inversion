@@ -1,0 +1,86 @@
+import pandas as pd
+
+# Definition der Gitter-Triangulations-Matrix auf dem 11x11 Potentialgitter
+triangulation_data = [
+    {
+        "Stufe": 1,
+        "Gitter_Parameter": "Gesamtzustände im Gitter (11x11)",
+        "Wert": 121,
+        "Formel_bzw_Bedingung": "N = 11 * 11",
+        "Beschreibung": (
+            "Maximale Anzahl diskreter Koordinatenpunkte im Potentialgitter"
+            " (Zustandsraum)."
+        ),
+    },
+    {
+        "Stufe": 2,
+        "Gitter_Parameter": "Mögliche 3-Punkt-Kombinationen",
+        "Wert": 287980,
+        "Formel_bzw_Bedingung": "binom(121, 3)",
+        "Beschreibung": (
+            "Kombinatorischer Gesamtsuchraum ohne Flächen- und"
+            " Geometrierestriktion."
+        ),
+    },
+    {
+        "Stufe": 3,
+        "Gitter_Parameter": "Degenerierte Kombinationen (Gesamtraum)",
+        "Wert": 6992,
+        "Formel_bzw_Bedingung": "Fläche = 0 (det = 0)",
+        "Beschreibung": (
+            "Kollineare 3-Punkt-Kombinationen im Gesamtraum, die keine"
+            " Dreiecksfläche aufspannen."
+        ),
+    },
+    {
+        "Stufe": 4,
+        "Gitter_Parameter": "Gesamte valide Dreiecke",
+        "Wert": 280988,
+        "Formel_bzw_Bedingung": "287.980 - 6.992",
+        "Beschreibung": (
+            "Echte nicht-degenerierte Dreiecke mit Fläche > 0 im Gesamtraum."
+        ),
+    },
+    {
+        "Stufe": 5,
+        "Gitter_Parameter": "Basis-Ankerpunkte (p1, p2)",
+        "Wert": 2,
+        "Formel_bzw_Bedingung": "p1 = (5, 5), p2 = (6, 4)",
+        "Beschreibung": (
+            "Fixierte Ankerpunkte: Symmetriepol p1 und"
+            " Phasenverschiebungs-Anker p2."
+        ),
+    },
+    {
+        "Stufe": 6,
+        "Gitter_Parameter": "Potenzielle p3-Punkte vor Kollinearitätsfilter",
+        "Wert": 119,
+        "Formel_bzw_Bedingung": "121 - 2",
+        "Beschreibung": (
+            "Verbleibende diskrete Gitterpunkte nach Abzug der beiden fixierten"
+            " Anker."
+        ),
+    },
+    {
+        "Stufe": 7,
+        "Gitter_Parameter": "Kollineare Punkte auf Diagonale (p1-p2)",
+        "Wert": 9,
+        "Formel_bzw_Bedingung": "x + y = 10 (11 Punkte minus p1, p2)",
+        "Beschreibung": (
+            "Punkte auf der Null-Flächen-Achse y - 5 = -1(x - 5), die"
+            " degenerierte Dreiecke bilden."
+        ),
+    },
+    {
+        "Stufe": 8,
+        "Gitter_Parameter": "Valide orthogonale Phasen-Kandidaten (p3)",
+        "Wert": 110,
+        "Formel_bzw_Bedingung": "119 - 9",
+        "Beschreibung": (
+            "Verbleibende freie Phasen-Schnittpunkte für die Dreiecks-Inversion"
+            " (Fläche > 0)."
+        ),
+    },
+]
+
+df_triangulation = pd.DataFrame(triangulation_data)
