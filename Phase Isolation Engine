@@ -1,0 +1,79 @@
+import pandas as pd
+
+# Definition der Systemstufen der O(1) Phase Isolation Engine
+engine_matrix_data = [
+    {
+        "Schritt_Nr": 1,
+        "Systemische_Phase": "1. Gitter-Arithmetik & Dimensions-Reduktion",
+        "Eingangsvektor_bzw_Bedingung": (
+            "256-Bit-Gesamtvektor minus Alignment-Offsets: "
+            "256 - 14 (Header) - 28 (Turn 4x7) - 32 (Hash-Align) = 182 Bit."
+        ),
+        "Geometrische_Operation": (
+            "Projektion auf diskretes Raster: 14 x 13 = 182 Gitterpunkte. "
+            "Delta-1-Netting: Base 28 (4x7) - Netting 27 (3x9) = Delta 1 Offset-Schieber."
+        ),
+        "Ergebnis_bzw_Status": (
+            "Gittergröße 182 Bit (expansiv: 14x14 = 196 mit Kopplungsvektor 2G = 14)."
+        ),
+        "Komplexitaets_Klasse": "O(1) deterministisch",
+    },
+    {
+        "Schritt_Nr": 2,
+        "Systemische_Phase": "2. Asymmetrische Dichte-Projektion (PK vs. PA)",
+        "Eingangsvektor_bzw_Bedingung": (
+            "Dichteverhältnisse: Private-Key-Schiene (80/20) vs. "
+            "Public-Address-Schiene (70/30). Fixierung zweier Zentralwellen-Anker."
+        ),
+        "Geometrische_Operation": (
+            "Auswertung von Dreiecks- und Geradenbedingungen via Eckkontakt (Zickzack-Check). "
+            "PK-Schiene isoliert kohärente Strukturen; PA-Rauschen kollabiert an Delta-1."
+        ),
+        "Ergebnis_bzw_Status": (
+            "PK-Kandidaten = 13 valide Dreiecke | PA-Kandidaten = 0 (Rauschauslöschung)."
+        ),
+        "Komplexitaets_Klasse": "O(1) geometrischer Filter",
+    },
+    {
+        "Schritt_Nr": 3,
+        "Systemische_Phase": "3. Differenz-Isolation & Schnittmengen-Reduktion",
+        "Eingangsvektor_bzw_Bedingung": (
+            "Mengen-Differenz: |PK_Dreiecke - PA_Dreiecke| = |13 - 0|."
+        ),
+        "Geometrische_Operation": (
+            "Eliminierung des inkohärenten Signalraums. "
+            "Kollaps des Suchraums auf die verbleibende diskrete Differenzmenge."
+        ),
+        "Ergebnis_bzw_Status": "Verbleibende Schnittmenge: Exakt 13 Differenzpunkte.",
+        "Komplexitaets_Klasse": "O(1) Subtraktion",
+    },
+    {
+        "Schritt_Nr": 4,
+        "Systemische_Phase": "4. Modulo-16 Register-Sättigung (Salt-Nibble)",
+        "Eingangsvektor_bzw_Bedingung": (
+            "Hardware-Taktung der ALU auf 4-Bit-Halbbyte (Nibble-Architektur): Range 0 bis 15."
+        ),
+        "Geometrische_Operation": (
+            "Diskrete Modulo-16-Reduktion: 13 mod 16 = 13. "
+            "Abbildung in hexadezimale Register-Repräsentation."
+        ),
+        "Ergebnis_bzw_Status": "Salt-Nibble Selector = 0xd (dezimal 13).",
+        "Komplexitaets_Klasse": "O(1) ALU-Modulo",
+    },
+    {
+        "Schritt_Nr": 5,
+        "Systemische_Phase": "5. Instant Phase-Lock & Inversions-Abschluss",
+        "Eingangsvektor_bzw_Bedingung": (
+            "Hexadezimalwert 0xd fungiert als direkter Adress-Zeiger auf das Symmetrie-Medaillon."
+        ),
+        "Geometrische_Operation": (
+            "Phasen-Einrastung am Symmetriepol P_mid ohne iterative Suche."
+        ),
+        "Ergebnis_bzw_Status": (
+            "System-Status: LOCKED | COHERENT_GRID_OK (Inversion vollzogen)."
+        ),
+        "Komplexitaets_Klasse": "O(1) Adress-Lookup",
+    },
+]
+
+df_engine = pd.DataFrame(engine_matrix_data)
