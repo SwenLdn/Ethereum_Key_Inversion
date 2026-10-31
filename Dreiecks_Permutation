@@ -1,0 +1,144 @@
+from itertools import combinations
+import numpy as np
+
+
+class GeometricInversionTest:
+
+    def __init__(self):
+        self.bit_length = 256
+
+    def test_arithmetic_alignment(self):
+        """1. Überprüfung der Alignment-Offsets und Gitter-Dimensionen"""
+        offset_header = 14
+        offset_turn = 28
+        offset_hash_align = 32
+
+        dim_reduced = (
+            self.bit_length - offset_header - offset_turn - offset_hash_align
+        )
+        grid_14x13 = 14 * 13
+        grid_14x14 = 14 * 14
+        dim_partial = self.bit_length - offset_header - offset_hash_align
+        delta_to_196 = dim_partial - grid_14x14
+
+        turn_base = 4 * 7
+        turn_netting = 3 * 9
+        delta_netting = turn_base - turn_netting
+
+        results = {
+            "dim_reduced": dim_reduced,
+            "grid_14x13": grid_14x13,
+            "arithmetic_match_182": dim_reduced == grid_14x13,
+            "grid_14x14": grid_14x14,
+            "dim_partial": dim_partial,
+            "delta_14": delta_to_196,
+            "delta_netting": delta_netting,
+        }
+        return results
+
+    def test_4_quadrant_geometry(self):
+        """2. Dreiecks-Bildung in einem 2x2-Quadranten-Block (1, 2, 3, 4)
+
+        Koordinaten: Q1=(0,0), Q2=(0,1), Q3=(1,0), Q4=(1,1)
+        """
+        quadrants = {
+            1: (0, 0),
+            2: (0, 1),
+            3: (1, 0),
+            4: (1, 1),
+        }
+        all_triangles = list(combinations(quadrants.keys(), 3))
+
+        valid_triangles = []
+        for t in all_triangles:
+            p1, p2, p3 = quadrants[t[0]], quadrants[t[1]], quadrants[t[2]]
+            # Flächenberechnung via Kreuzprodukt (Gaußsche Trapezformel)
+            area = 0.5 * abs(
+                p1[0] * (p2[1] - p3[1])
+                + p2[0] * (p3[1] - p1[1])
+                + p3[0] * (p1[1] - p2[1])
+            )
+            if area > 0:
+                valid_triangles.append((t, area))
+
+        return {
+            "total_3_combinations": len(all_triangles),
+            "non_degenerate_triangles": len(valid_triangles),
+            "triangles": valid_triangles,
+        }
+
+    def test_11x11_grid_differential(
+        self, p1_idx=60, p2_idx=70, ratio_p=(0.80, 0.20), ratio_q=(0.70, 0.30)
+    ):
+        """3. Prüfung der Punktreduktion auf einem 11x11-Gitter bei fixierten Ankern
+
+        Index 0 bis 120 (121 Punkte), Zentrum bei Index 60 = (5, 5).
+        """
+        grid_dim = 11
+        total_points = grid_dim * grid_dim
+
+        def idx_to_coord(idx):
+            return (idx // grid_dim, idx % grid_dim)
+
+        p1 = idx_to_coord(p1_idx)
+        p2 = idx_to_coord(p2_idx)
+
+        # Richtungsvektor und Mittellinie
+        midpoint = ((p1[0] + p2[0]) / 2.0, (p1[1] + p2[1]) / 2.0)
+
+        # Mögliche 3. Punkte für primäres Dreieck (Fläche > 0)
+        candidate_p3 = []
+        for idx in range(total_points):
+            if idx in (p1_idx, p2_idx):
+                continue
+            p3 = idx_to_coord(idx)
+            area = 0.5 * abs(
+                p1[0] * (p2[1] - p3[1])
+                + p2[0] * (p3[1] - p1[1])
+                + p3[0] * (p1[1] - p2[1])
+            )
+            if area > 0:
+                candidate_p3.append((idx, p3, area))
+
+        # Punktspiegelung / Inversion am Mittelpunkt der fixen Basis P1-P2
+        inverse_pairs = []
+        for idx, p3, area in candidate_p3:
+            inv_x = 2 * midpoint[0] - p3[0]
+            inv_y = 2 * midpoint[1] - p3[1]
+
+            # Prüfen, ob der invertierte Punkt exakt auf dem diskreten ganzzahligen Gitter liegt
+            if (
+                inv_x.is_integer()
+                and inv_y.is_integer()
+                and 0 <= inv_x < grid_dim
+                and 0 <= inv_y < grid_dim
+            ):
+                inv_idx = int(inv_x) * grid_dim + int(inv_y)
+                inverse_pairs.append((idx, inv_idx, area))
+
+        # Filterung über das Wahrscheinlichkeits-Differential (80/20 vs 70/30)
+        differential_factor = (ratio_p[0] / ratio_p[1]) / (
+            ratio_q[0] / ratio_q[1]
+        )  # (0.8/0.2) / (0.7/0.3) = 4.0 / 2.333... = 1.714...
+
+        return {
+            "p1": (p1_idx, p1),
+            "p2": (p2_idx, p2),
+            "midpoint": midpoint,
+            "total_candidate_p3": len(candidate_p3),
+            "discrete_symmetric_inverses": len(inverse_pairs),
+            "differential_factor": round(differential_factor, 4),
+            "sample_inverse_pairs": inverse_pairs[:4],
+        }
+
+
+# Programmausführung
+tester = GeometricInversionTest()
+res_arithmetic = tester.test_arithmetic_alignment()
+res_4q = tester.test_4_quadrant_geometry()
+res_grid = tester.test_11x11_grid_differential()
+
+print("=== ERGEBNISSE DER MATHEMATISCHEN VALIDIERUNG ===")
+print("1. Arithmetik:", res_arithmetic)
+print("2. 4-Quadranten-Block:", res_4q)
+print("3. 11x11 Gitter-Inversion:", res_grid)
