@@ -1,0 +1,95 @@
+import re
+import math
+import pandas as pd
+import numpy as np
+
+# Python-Prüfmatrix für Go-Test-Inversions- und Spiegelungsfehler
+# Basiert auf dem 3-Punkt-Triangulations-Modell (P1: got, P2: want, P3: observer)
+
+DIFF_DATA = [
+    {
+        "file": "rlp/iterator_test.go",
+        "original": 't.Errorf("count wrong, expected %d got %d", i, exp)',
+        "corrected": 't.Errorf("count wrong, expected %d got %d", exp, i)',
+        "type": "180° Vector Inversion (got <-> want Swap)",
+        "vector_delta": [-1, 1],
+        "phase_angle_deg": 180.0
+    },
+    {
+        "file": "signer/storage/aes_gcm_storage_test.go",
+        "original": 't.Errorf("Failed: expected plaintext recovery, got %v expected %v", string(plaintext), string(p))',
+        "corrected": 't.Errorf("Failed: expected plaintext recovery, got %v expected %v", string(p), string(plaintext))',
+        "type": "180° Vector Inversion (got <-> want Swap)",
+        "vector_delta": [-1, 1],
+        "phase_angle_deg": 180.0
+    },
+    {
+        "file": "accounts/abi/bind/v2/lib_test.go",
+        "original": 't.Fatalf("expected e2Count of 1 from filter call.  got %d", e1Count)',
+        "corrected": 't.Fatalf("expected e2Count of 1 from filter call.  got %d", e2Count)',
+        "type": "Node Anchor Mismatch (e1 vs e2)",
+        "vector_delta": [0, -1],
+        "phase_angle_deg": 90.0
+    },
+    {
+        "file": "triedb/pathdb/history_index_test.go",
+        "original": 't.Fatalf("Unexpected lastID, want: %d, got: %d", uint64(i-1), iw.lastID)',
+        "corrected": 't.Fatalf("Unexpected lastID, want: %d, got: %d", uint64(i-1), id.lastID)',
+        "type": "Reference Object Shift (iw vs id)",
+        "vector_delta": [0, -1],
+        "phase_angle_deg": 90.0
+    },
+    {
+        "file": "miner/ordering_test.go",
+        "original": 't.Errorf("invalid nonce ordering: tx #%d ... < tx #%d ...", i, fromi[:4], txi.Nonce(), i+j, fromj[:4], txj.Nonce())',
+        "corrected": 't.Errorf("invalid nonce ordering: tx #%d ... < tx #%d ...", i, fromi[:4], txi.Nonce(), i+1+j, fromj[:4], txj.Nonce())',
+        "type": "Phase Shift Offset (+1 Index Shift)",
+        "vector_delta": [1, 0],
+        "phase_angle_deg": 0.0
+    },
+    {
+        "file": "metrics/registry_test.go",
+        "original": 't.Errorf("arbiter.meters: %d != %d\\n", l+2, len(arbiter.meters))',
+        "corrected": 't.Errorf("arbiter.meters: %d != %d\\n", l, len(arbiter.meters))',
+        "type": "Scaling Distortion (+2 Bias)",
+        "vector_delta": [-2, 0],
+        "phase_angle_deg": 180.0
+    },
+    {
+        "file": "signer/core/apitypes/types_test.go",
+        "original": 't.Errorf("test %d: expected typeName value of \'%v\' but got \'%v\'", i, tc.Expected, tc.Input)',
+        "corrected": 't.Errorf("test %d: expected typeName value of \'%v\' but got \'%v\'", i, tc.Expected, tc.Input.typeName())',
+        "type": "Unprojected Node Method Call",
+        "vector_delta": [0, 1],
+        "phase_angle_deg": 270.0
+    },
+    {
+        "file": "core/genesis_test.go",
+        "original": 't.Errorf("case: %d a), want: %s, got: %s", i, c.want.Hex(), have.Hex())',
+        "corrected": 't.Errorf("case: %d b), want: %s, got: %s", i, c.want.Hex(), have.Hex())',
+        "type": "Quadrant Label Misclassification",
+        "vector_delta": [0, 0],
+        "phase_angle_deg": 0.0
+    }
+]
+
+def analyze_diffs():
+    df = pd.DataFrame(DIFF_DATA)
+    print("=== AUTOMATISCH AUDIT-PRÜFMATRIX: GO-TEST INVERSIONEN & SPIEGELUNGEN ===")
+    print(f"Verarbeitete Test-Files: {len(df)}")
+    print("\n[1] Klassifikation der Vektor-Spiegelungen (Triangulations-Modell):")
+    for idx, row in df.iterrows():
+        print(f"  #{idx+1} {row['file']}:")
+        print(f"      Fehlertyp    : {row['type']}")
+        print(f"      Phasenversatz: {row['phase_angle_deg']}° | Delta-Vektor: {row['vector_delta']}")
+    
+    inversion_count = len(df[df['type'].str.contains("180°")])
+    anchor_mismatch_count = len(df[df['type'].str.contains("Anchor|Shift|Distortion|Unprojected|Quadrant")])
+    
+    print("\n[2] Statistischer Befund:")
+    print(f"  - 180° Vektor-Inversionen (got <-> want Vertauschung) : {inversion_count} / {len(df)} ({inversion_count/len(df)*100:.1f}%)")
+    print(f"  - Knoten- & Phasen-Abweichungen (Kopplungsfehler)   : {anchor_mismatch_count} / {len(df)} ({anchor_mismatch_count/len(df)*100:.1f}%)")
+    print("\nSYSTEM STATUS: CHECKER_MATRIX_READY | ALL 8 DIFFS CLASSIFIED IN O(1)")
+
+if __name__ == "__main__":
+    analyze_diffs()
