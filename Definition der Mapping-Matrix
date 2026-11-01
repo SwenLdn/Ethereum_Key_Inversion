@@ -1,0 +1,88 @@
+import pandas as pd
+
+# Definition der Mapping-Matrix: Go-Bloom-Filter vs. 2D-Gitter-Hardware-Realität
+bloom_geometry_data = [
+    {
+        "Schritt_Nr": 1,
+        "Code_Syntax_1D_Algebra": "make([][8]uint64, bits/512 + 1)",
+        "Hardware_Funktion": (
+            "Block-Allokation von Arrays zu je 8 Wörtern à 64 Bit"
+        ),
+        "Geometrische_Realitaet_2D": (
+            "8 Register (A..H) x 64 Bit = 512-Zellen 2D-Gitterplatte"
+        ),
+        "Topologische_Bedeutung": (
+            "Physikalische Register-Bank-Anordnung; analog zu den 8"
+            " SHA-256-Arbeitsvariablen (A..H) als planares 8x64-Feld."
+        ),
+        "Inversions_Parameter": "512 Bit Basis-Block (2^9 Adressraum)",
+    },
+    {
+        "Schritt_Nr": 2,
+        "Code_Syntax_1D_Algebra": "for i := range uint64(3)",
+        "Hardware_Funktion": (
+            "Feste 3-fache Schleifenausführung zur Hash-Indexierung"
+        ),
+        "Geometrische_Realitaet_2D": "3-Punkt-Dreiecks-Stanzung (P1, P2, P3)",
+        "Topologische_Bedeutung": (
+            "Erzwungene planare Dreiecks-Symmetrie im R^2. Exakt 3 diskrete"
+            " Punkte determinieren ein Dreieck auf dem Raster; keine"
+            " N-dimensionale Streuung."
+        ),
+        "Inversions_Parameter": (
+            "Kombinatorik k=3 (Deterministischer Dreiecksanker)"
+        ),
+    },
+    {
+        "Schritt_Nr": 3,
+        "Code_Syntax_1D_Algebra": "(key >> (9 * i)) & 511",
+        "Hardware_Funktion": (
+            "Extraktion von 3 aufeinanderfolgenden 9-Bit-Nibbles (27 Bit"
+            " Gesamt)"
+        ),
+        "Geometrische_Realitaet_2D": (
+            "3 x 9-Bit Phasenfenster (2^9 = 512 diskrete Adressen)"
+        ),
+        "Topologische_Bedeutung": (
+            "Exakte Adressierung jeder Koordinate auf der 512er Platte."
+            " 27-Bit-Nutzung entspricht dem Netting-Faktor (3 x 9 = 27) im"
+            " Delta-1-Versatz."
+        ),
+        "Inversions_Parameter": "9 Bit / Koordinate -> Modulo-512 Phasenraum",
+    },
+    {
+        "Schritt_Nr": 4,
+        "Code_Syntax_1D_Algebra": "blk[bit / 64] |= 1 << (bit % 64)",
+        "Hardware_Funktion": (
+            "Ganzzahldivision durch 64 (Zeile) und Modulo 64 (Bit-Offset)"
+        ),
+        "Geometrische_Realitaet_2D": (
+            "2D-Matrixkoordinaten: Zeile Y = bit/64 (0..7), Spalte X = bit%64"
+            " (0..63)"
+        ),
+        "Topologische_Bedeutung": (
+            "Zeilen-Umschaltung über Register A..H (Quadranten-Selektion) und"
+            " physischer Stempel-Eindruck an der diskreten X-Koordinate auf der"
+            " 64-Bit-Schiene."
+        ),
+        "Inversions_Parameter": "(Y, X) Gitter-Projektion",
+    },
+    {
+        "Schritt_Nr": 5,
+        "Code_Syntax_1D_Algebra": "(key >> 32) * len(blocks) >> 32",
+        "Hardware_Funktion": (
+            "High-32 Bit Skalierung zur Ermittlung des Block-Index"
+        ),
+        "Geometrische_Realitaet_2D": (
+            "Quadranten-Split: High-32 (Block) vs. Low-27 (Dreiecks-Punkte)"
+        ),
+        "Topologische_Bedeutung": (
+            "Systemische Entkopplung: Obere 32 Bit definieren das Makro-Gitter"
+            " (Block-Anker), untere 27 Bit stanzen die 3 Dreiecks-Knoten auf"
+            " der Mikro-Platte ein."
+        ),
+        "Inversions_Parameter": "Hierarchische 2D-Schablonen-Trennung",
+    },
+]
+
+df_bloom_filter_geometry = pd.DataFrame(bloom_geometry_data)
