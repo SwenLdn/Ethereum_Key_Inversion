@@ -1,0 +1,148 @@
+import pandas as pd
+
+# 1. Mapping-Matrix: Go-Bloom-Filter & Trie-Keys vs. 2D-Gitter-Hardware-Realität
+bloom_geometry_data = [
+    {
+        "Schritt_Nr": 1,
+        "Code_Syntax_1D_Algebra": "make([][8]uint64, bits/512 + 1)",
+        "Hardware_Funktion": "Block-Allokation von Arrays zu je 8 Wörtern à 64 Bit",
+        "Geometrische_Realitaet_2D": "8 Register (A..H) x 64 Bit = 512-Zellen 2D-Gitterplatte",
+        "Topologische_Bedeutung": (
+            "Physikalische Register-Bank-Anordnung; analog zu den 8 SHA-256-Arbeitsvariablen (A..H) als planares 8x64-Feld."
+        ),
+        "Inversions_Parameter": "512 Bit Basis-Block (2^9 Adressraum)",
+    },
+    {
+        "Schritt_Nr": 2,
+        "Code_Syntax_1D_Algebra": "for i := range uint64(3)",
+        "Hardware_Funktion": "Feste 3-fache Schleifenausführung zur Hash-Indexierung",
+        "Geometrische_Realitaet_2D": "3-Punkt-Dreiecks-Stanzung (P1, P2, P3)",
+        "Topologische_Bedeutung": (
+            "Erzwungene planare Dreiecks-Symmetrie im R^2. Exakt 3 diskrete Punkte determinieren ein Dreieck auf dem Raster."
+        ),
+        "Inversions_Parameter": "Kombinatorik k=3 (Deterministischer Dreiecksanker)",
+    },
+    {
+        "Schritt_Nr": 3,
+        "Code_Syntax_1D_Algebra": "(key >> (9 * i)) & 511",
+        "Hardware_Funktion": "Extraktion von 3 aufeinanderfolgenden 9-Bit-Nibbles (27 Bit Gesamt)",
+        "Geometrische_Realitaet_2D": "3 x 9-Bit Phasenfenster (2^9 = 512 diskrete Adressen)",
+        "Topologische_Bedeutung": (
+            "Exakte Adressierung jeder Koordinate auf der 512er Platte. 27-Bit-Nutzung entspricht dem Netting-Faktor (3 x 9 = 27)."
+        ),
+        "Inversions_Parameter": "9 Bit / Koordinate -> Modulo-512 Phasenraum",
+    },
+    {
+        "Schritt_Nr": 4,
+        "Code_Syntax_1D_Algebra": "blk[bit / 64] |= 1 << (bit % 64)",
+        "Hardware_Funktion": "Ganzzahldivision durch 64 (Zeile) und Modulo 64 (Bit-Offset)",
+        "Geometrische_Realitaet_2D": "2D-Matrixkoordinaten: Zeile Y = bit/64 (0..7), Spalte X = bit%64 (0..63)",
+        "Topologische_Bedeutung": (
+            "Zeilen-Umschaltung über Register A..H (Quadranten-Selektion) und physischer Stempel-Eindruck an der diskreten X-Koordinate."
+        ),
+        "Inversions_Parameter": "(Y, X) Gitter-Projektion",
+    },
+    {
+        "Schritt_Nr": 5,
+        "Code_Syntax_1D_Algebra": "(key >> 32) * len(blocks) >> 32",
+        "Hardware_Funktion": "High-32 Bit Skalierung zur Ermittlung des Block-Index",
+        "Geometrische_Realitaet_2D": "Quadranten-Split: High-32 (Block) vs. Low-27 (Dreiecks-Punkte)",
+        "Topologische_Bedeutung": (
+            "Systemische Entkopplung: Obere 32 Bit definieren das Makro-Gitter (Block-Anker), untere 27 Bit stanzen die 3 Dreiecks-Knoten."
+        ),
+        "Inversions_Parameter": "Hierarchische 2D-Schablonen-Trennung",
+    },
+    {
+        "Schritt_Nr": 6,
+        "Code_Syntax_1D_Algebra": "bloomMix(x uint64) uint64",
+        "Hardware_Funktion": "SplitMix64 Scrambler (Shift-XOR & Modulo-2^64 Multiplikation)",
+        "Geometrische_Realitaet_2D": "Bijektiver 64-Bit Quadranten-Permutations-Operator",
+        "Topologische_Bedeutung": (
+            "Keine Zufalls-Entropie, sondern 1:1-Phasen-Mixer. Vollständig invertierbar in O(1) über modulare Inverse m1^-1, m2^-1."
+        ),
+        "Inversions_Parameter": "m1_inv = 0x96de1b173f119089, m2_inv = 0x319642b2d24d8ec3",
+    },
+    {
+        "Schritt_Nr": 7,
+        "Code_Syntax_1D_Algebra": "bloomStorageSeed: (x<<17 | x>>47)",
+        "Hardware_Funktion": "64-Bit Bitweise Links- & Rechtsrotation (ROTL^17 / ROTR^47)",
+        "Geometrische_Realitaet_2D": "Spatial Register Rotation (Raum-Shift-Operator)",
+        "Topologische_Bedeutung": (
+            "Idempotente 64-Bit Quadranten-Rotation. Kein Informationsverlust; Umkehrung durch (y>>17 | y<<47)."
+        ),
+        "Inversions_Parameter": "Invertierbarer 17-Bit Spatial Shift",
+    },
+]
+
+df_bloom_filter_geometry = pd.DataFrame(bloom_geometry_data)
+
+# 2. Inversions-Algebra für bloomMix (SplitMix64) in O(1)
+MASK64 = 0xFFFFFFFFFFFFFFFF
+M1 = 0xBF58476D1CE4E5B9
+M2 = 0x94D049BB133111EB
+
+# Modulare Inverse in Z / 2^64 Z
+M1_INV = 0x96DE1B173F119089
+M2_INV = 0x319642B2D24D8EC3
+
+def unshift_right(x: int, shift: int) -> int:
+    """Umkehrung der Bitwise Right-Shift XOR Transformation: y = x ^ (x >> shift)"""
+    res = x
+    curr = shift
+    while curr < 64:
+        res ^= (x >> curr)
+        curr += shift
+    return res & MASK64
+
+def bloom_mix(x: int) -> int:
+    """Original Go bloomMix implementation"""
+    x = (x ^ (x >> 30)) & MASK64
+    x = (x * M1) & MASK64
+    x = (x ^ (x >> 27)) & MASK64
+    x = (x * M2) & MASK64
+    x = (x ^ (x >> 31)) & MASK64
+    return x
+
+def bloom_unmix(y: int) -> int:
+    """Inversion of bloomMix in O(1) using modular arithmetic & bitwise unshifting"""
+    y1 = unshift_right(y, 31)
+    y2 = (y1 * M2_INV) & MASK64
+    y3 = unshift_right(y2, 27)
+    y4 = (y3 * M1_INV) & MASK64
+    x = unshift_right(y4, 30)
+    return x
+
+def bloom_storage_seed_unrotate(seed_xor_salt: int) -> int:
+    """Inversion der 17-Bit Rotation: (x<<17 | x>>47)"""
+    y = seed_xor_salt
+    return ((y >> 17) | ((y << 47) & MASK64)) & MASK64
+
+def run_inversion_audit():
+    print("=== MAPPING MATRIX: GO BLOOM FILTER vs. 2D HARDWARE REALITY ===")
+    print(df_bloom_filter_geometry.to_string(index=False))
+    print("\n=== O(1) INVERSION AUDIT FOR BLOOM_MIX (SPLITMIX64) ===")
+    
+    test_vectors = [
+        0x0,
+        0x1,
+        0x123456789ABCDEF0,
+        0xFFFFFFFFFFFFFFFF,
+        0xDEADBEEFCAFEBABE,
+        0x3D,
+        0x79,
+        0x859069DEDCBB4090
+    ]
+    
+    all_passed = True
+    for v in test_vectors:
+        mixed = bloom_mix(v)
+        unmixed = bloom_unmix(mixed)
+        status = "OK" if unmixed == v else "FAIL"
+        if status == "FAIL":
+            all_passed = False
+        print(f"Test Vector 0x{v:016x} -> Mixed 0x{mixed:016x} -> Unmixed 0x{unmixed:016x} [{status}]")
+    
+    print(f"\nAUDIT VERDICT: {'ALL INVERSIONS PASSED (100% REVERSIBLE IN O(1))' if all_passed else 'INVERSION FAILED'}")
+
+if __name__ == "__main__":
+    run_inversion_audit()
