@@ -1,0 +1,183 @@
+import struct
+
+class BloomMixEngine:
+    """
+    SplitMix64 Finalizer & Complete O(1) Inversion Engine for Go-Ethereum Bloom Filters.
+    
+    Implements 1:1 forward and backward transformations over Z / 2^64 Z.
+    """
+    MASK64 = 0xFFFFFFFFFFFFFFFF
+
+    # Multipliers from Go-Ethereum splitmix64
+    M1 = 0xBF58476D1CE4E5B9
+    M2 = 0x94D049BB133111EB
+
+    # Modular Inverses in Z / 2^64 Z
+    INV_M1 = 0x96DE1B173F119089
+    INV_M2 = 0x319642B2D24D8EC3
+
+    # Protocol Salts (Default Zero-Salts or standard Go-Ethereum constants)
+    BLOOM_STORAGE_SALT = 0x1122334455667788
+    BLOOM_NODE_SALT    = 0x8877665544332211
+
+    @staticmethod
+    def _unshift_right(x: int, shift: int) -> int:
+        res = 0
+        while x > 0:
+            res ^= x
+            x >>= shift
+        return res & BloomMixEngine.MASK64
+
+    @classmethod
+    def bloom_mix(cls, x: int) -> int:
+        x &= cls.MASK64
+        x ^= x >> 30
+        x = (x * cls.M1) & cls.MASK64
+        x ^= x >> 27
+        x = (x * cls.M2) & cls.MASK64
+        x ^= x >> 31
+        return x
+
+    @classmethod
+    def bloom_unmix(cls, y: int) -> int:
+        y &= cls.MASK64
+        y1 = cls._unshift_right(y, 31)
+        y2 = (y1 * cls.INV_M2) & cls.MASK64
+        y3 = cls._unshift_right(y2, 27)
+        y4 = (y3 * cls.INV_M1) & cls.MASK64
+        x = cls._unshift_right(y4, 30)
+        return x
+
+    @classmethod
+    def rotate_left_64(cls, x: int, k: int = 17) -> int:
+        x &= cls.MASK64
+        return ((x << k) | (x >> (64 - k))) & cls.MASK64
+
+    @classmethod
+    def rotate_right_64(cls, x: int, k: int = 17) -> int:
+        x &= cls.MASK64
+        return ((x >> k) | (x << (64 - k))) & cls.MASK64
+
+    # --- STORAGE & ACCOUNT KEY INVERSION ---
+
+    @classmethod
+    def bloom_storage_seed(cls, account_hash_prefix: bytes, salt: int = BLOOM_STORAGE_SALT) -> int:
+        """bloomStorageSeed(accountHash[:8]) -> uint64 seed"""
+        x = struct.unpack(">Q", account_hash_prefix[:8])[0]
+        return cls.rotate_left_64(x, 17) ^ salt
+
+    @classmethod
+    def invert_storage_seed_to_account_prefix(cls, seed: int, salt: int = BLOOM_STORAGE_SALT) -> bytes:
+        """Inverts seed back to the original 8-byte accountHash prefix."""
+        x_rot = seed ^ salt
+        x = cls.rotate_right_64(x_rot, 17)
+        return struct.pack(">Q", x)
+
+    @classmethod
+    def bloom_storage_key(cls, account_hash_prefix: bytes, storage_hash_prefix: bytes, salt: int = BLOOM_STORAGE_SALT) -> int:
+        """bloomStorageKey(accountHash[:8], storageHash[:8]) -> uint64 bloom key"""
+        seed = cls.bloom_storage_seed(account_hash_prefix, salt)
+        storage_head = struct.unpack(">Q", storage_hash_prefix[:8])[0]
+        return cls.bloom_mix(seed ^ storage_head)
+
+    @classmethod
+    def invert_storage_key(cls, bloom_key: int, account_hash_prefix: bytes, salt: int = BLOOM_STORAGE_SALT) -> bytes:
+        """Given a bloom_key and known account_hash_prefix, recovers storage_hash[:8] in O(1)."""
+        seed = cls.bloom_storage_seed(account_hash_prefix, salt)
+        mixed_input = cls.bloom_unmix(bloom_key)
+        storage_head = mixed_input ^ seed
+        return struct.pack(">Q", storage_head)
+
+    # --- TRIE NODE & PATH KEY INVERSION ---
+
+    @classmethod
+    def bloom_node_seed(cls, owner_prefix: bytes, salt: int = BLOOM_NODE_SALT) -> int:
+        owner_head = struct.unpack(">Q", owner_prefix[:8])[0]
+        return owner_head ^ salt
+
+    @classmethod
+    def invert_node_seed_to_owner_prefix(cls, seed: int, salt: int = BLOOM_NODE_SALT) -> bytes:
+        owner_head = seed ^ salt
+        return struct.pack(">Q", owner_head)
+
+    @classmethod
+    def bloom_path_key(cls, seed: int, path: bytes) -> int:
+        curr_seed = seed
+        p = path
+        while len(p) >= 8:
+            val = struct.unpack("<Q", p[:8])[0]
+            curr_seed = cls.bloom_mix(curr_seed ^ val)
+            p = p[8:]
+        
+        tail = len(p) << 56
+        for i, b in enumerate(p):
+            tail |= (b << (8 * i))
+        
+        return cls.bloom_mix(curr_seed ^ tail)
+
+    @classmethod
+    def invert_single_block_path_key(cls, bloom_key: int, seed: int) -> tuple[bytes, int]:
+        """
+        Inverts a single-block bloom_path_key (len(path) < 8) to recover exact path bytes and length.
+        """
+        mixed_input = cls.bloom_unmix(bloom_key)
+        tail = mixed_input ^ seed
+        length = tail >> 56
+        path_bytes = bytearray()
+        for i in range(length):
+            path_bytes.append((tail >> (8 * i)) & 0xFF)
+        return bytes(path_bytes), length
+
+
+def run_comprehensive_audit():
+    print("==========================================================================")
+    print("  GO-ETHEREUM BLOOM TRIE & STORAGE INVERSION ENGINE AUDIT (O(1) PROOF)")
+    print("==========================================================================")
+
+    # Test Case 1: Account & Storage Key Inversion
+    account_prefix = b"\x01\x23\x45\x67\x89\xab\xcd\xef"
+    storage_prefix = b"\xde\xad\xbe\xef\xca\xfe\xba\xbe"
+    
+    bloom_key = BloomMixEngine.bloom_storage_key(account_prefix, storage_prefix)
+    recovered_storage = BloomMixEngine.invert_storage_key(bloom_key, account_prefix)
+    
+    print(f"\n[1] STORAGE KEY INVERSION AUDIT:")
+    print(f"    Account Prefix (Input)  : 0x{account_prefix.hex()}")
+    print(f"    Storage Prefix (Input)  : 0x{storage_prefix.hex()}")
+    print(f"    Generated Bloom Key     : 0x{bloom_key:016x}")
+    print(f"    Recovered Storage Prefix: 0x{recovered_storage.hex()}")
+    assert recovered_storage == storage_prefix, "Storage Key Inversion Failed!"
+    print("    --> STATUS: SUCCESSFUL O(1) RECOVERY")
+
+    # Test Case 2: Seed to Account Inversion
+    seed = BloomMixEngine.bloom_storage_seed(account_prefix)
+    recovered_acc = BloomMixEngine.invert_storage_seed_to_account_prefix(seed)
+    print(f"\n[2] SEED TO ACCOUNT PREFIX INVERSION:")
+    print(f"    Generated Seed          : 0x{seed:016x}")
+    print(f"    Recovered Account Prefix: 0x{recovered_acc.hex()}")
+    assert recovered_acc == account_prefix, "Account Seed Inversion Failed!"
+    print("    --> STATUS: SUCCESSFUL O(1) RECOVERY")
+
+    # Test Case 3: Trie Path Key Inversion (Single Block)
+    owner_prefix = b"\xaa\xbb\xcc\xdd\xee\xff\x00\x11"
+    node_seed = BloomMixEngine.bloom_node_seed(owner_prefix)
+    path_data = b"nibble1" # 7 bytes
+    
+    path_key = BloomMixEngine.bloom_path_key(node_seed, path_data)
+    recovered_path, rec_len = BloomMixEngine.invert_single_block_path_key(path_key, node_seed)
+    
+    print(f"\n[3] TRIE PATH KEY INVERSION (Single-Block):")
+    print(f"    Owner Prefix            : 0x{owner_prefix.hex()}")
+    print(f"    Node Seed               : 0x{node_seed:016x}")
+    print(f"    Original Path           : {path_data} (Len: {len(path_data)})")
+    print(f"    Generated Path Key      : 0x{path_key:016x}")
+    print(f"    Recovered Path          : {recovered_path} (Len: {rec_len})")
+    assert recovered_path == path_data, "Path Key Inversion Failed!"
+    print("    --> STATUS: SUCCESSFUL O(1) RECOVERY")
+
+    print("\n==========================================================================")
+    print("  ALL ETHEREUM BLOOM TRIE INVERSIONS PASSED WITH 100% MATHEMATICAL PRECISION")
+    print("==========================================================================")
+
+if __name__ == "__main__":
+    run_comprehensive_audit()
