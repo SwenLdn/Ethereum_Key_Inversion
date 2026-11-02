@@ -1,0 +1,93 @@
+class BloomMixEngine:
+    """Implementierung des SplitMix64-Finalizers aus Go-Ethereum sowie dessen
+
+    exakter O(1)-Inversionsfunktion (bloomUnmix) über Z / 2^64 Z.
+    """
+
+    MASK64 = 0xFFFFFFFFFFFFFFFF
+
+    # Multiplikatoren aus dem Go-Quellcode
+    M1 = 0xBF58476D1CE4E5B9
+    M2 = 0x94D049BB133111EB
+
+    # Berechnete modulare Inverse in Z / 2^64 Z: (M * INV) & MASK64 == 1
+    INV_M1 = 0x96DE1B173F119089
+    INV_M2 = 0x319642B2D24D8EC3
+
+    @staticmethod
+    def _unshift_right(x: int, shift: int) -> int:
+        """Kehrt die Operation y = x ^ (x >> shift) für 64-Bit-Werte um."""
+        res = 0
+        while x > 0:
+            res ^= x
+            x >>= shift
+        return res & BloomMixEngine.MASK64
+
+    @classmethod
+    def bloom_mix(cls, x: int) -> int:
+        """1:1-Nachbildung der Go-Funktion bloomMix(x uint64) uint64."""
+        x &= cls.MASK64
+        x ^= x >> 30
+        x = (x * cls.M1) & cls.MASK64
+        x ^= x >> 27
+        x = (x * cls.M2) & cls.MASK64
+        x ^= x >> 31
+        return x
+
+    @classmethod
+    def bloom_unmix(cls, y: int) -> int:
+        """Exakte O(1)-Inversion von bloomMix ohne Datenverlust."""
+        y &= cls.MASK64
+
+        # 1. Schritt: Inversion von x ^= x >> 31
+        y1 = cls._unshift_right(y, 31)
+
+        # 2. Schritt: Inversion von x *= M2 (mod 2^64)
+        y2 = (y1 * cls.INV_M2) & cls.MASK64
+
+        # 3. Schritt: Inversion von x ^= x >> 27
+        y3 = cls._unshift_right(y2, 27)
+
+        # 4. Schritt: Inversion von x *= M1 (mod 2^64)
+        y4 = (y3 * cls.INV_M1) & cls.MASK64
+
+        # 5. Schritt: Inversion von x ^= x >> 30
+        x = cls._unshift_right(y4, 30)
+
+        return x
+
+    @classmethod
+    def rotate_left_64(cls, x: int, k: int) -> int:
+        """Entspricht (x << 17 | x >> 47) in bloomStorageSeed."""
+        x &= cls.MASK64
+        return ((x << k) | (x >> (64 - k))) & cls.MASK64
+
+    @classmethod
+    def rotate_right_64(cls, x: int, k: int) -> int:
+        """Invertiert die Rotation aus bloomStorageSeed."""
+        x &= cls.MASK64
+        return ((x >> k) | (x << (64 - k))) & cls.MASK64
+
+
+# Test- und Validierungslauf
+if __name__ == "__main__":
+    engine = BloomMixEngine()
+
+    test_vektoren = [
+        0,
+        1,
+        0xAAC311C576,  # 733417162102 (Vorheriger Testschlüssel)
+        0x123456789ABCDEF0,
+        0xDEADBEEFCAFEBABE,
+        0xFFFFFFFFFFFFFFFF,
+    ]
+
+    print("=== VALIDIERUNG DER O(1) INVERSION (bloomUnmix) ===")
+    for val in test_vektoren:
+        scrambled = engine.bloom_mix(val)
+        recovered = engine.bloom_unmix(scrambled)
+        assert val == recovered, (
+            f"Inversionsfehler bei {hex(val)}: erhalten {hex(recovered)}"
+        )
+        print(f"Eingang: {hex(val):<18} -> Gemischt: {hex(scrambled):<18} ->"
+              f" Rekonstruiert: {hex(recovered):<18} | STATUS: OK")
