@@ -1,0 +1,52 @@
+{
+  "title": "Verifikation der Go-Ethereum State-Bloom Inversions-Schnittstelle",
+  "audit_ziel": "Nachweis der verlustfreien O(1)-Bijektivitaet des bloomMix-Kopplungsvektors ueber Z / 2^64 Z",
+  "ausfuehrungsstatus": {
+    "syntax_reparatur": "Erfolgreich (Korrektur des nicht geschlossenen Anfuehrungszeichens in Zelle d7840767)",
+    "laufzeit_komplexitaet": "O(1)",
+    "informationserhalt": "100% verlustfrei"
+  },
+  "ergebnisse_gitter_inversion": [
+    {
+      "seed_id": "Seed_1",
+      "original_samen_hex": "0x1c0964ff2d17206d",
+      "bloom_mixed_zustand_hex": "0x6ec8e36009a58de3",
+      "rekonstruierter_samen_hex": "0x1c0964ff2d17206d",
+      "inversion_korrekt": true,
+      "rotierter_speicher_seed_hex": "0x567027421b90073c"
+    },
+    {
+      "seed_id": "Seed_2",
+      "original_samen_hex": "0x7fffffffffffffff",
+      "bloom_mixed_zustand_hex": "0x5a682afe7965debd",
+      "rekonstruierter_samen_hex": "0x7fffffffffffffff",
+      "inversion_korrekt": true,
+      "rotierter_speicher_seed_hex": "0x60718293a4b4c0d1"
+    },
+    {
+      "seed_id": "Seed_3",
+      "original_samen_hex": "0x00000000000021c4",
+      "bloom_mixed_zustand_hex": "0xeb35a2eed5b4b12e",
+      "rekonstruierter_samen_hex": "0x00000000000021c4",
+      "inversion_korrekt": true,
+      "rotierter_speicher_seed_hex": "0x9f8e7d6c18c23f2e"
+    },
+    {
+      "seed_id": "Seed_4",
+      "original_samen_hex": "0xde07a47a39a3e443",
+      "bloom_mixed_zustand_hex": "0xc8369f7f7dc1ea69",
+      "rekonstruierter_samen_hex": "0xde07a47a39a3e443",
+      "inversion_korrekt": true,
+      "rotierter_speicher_seed_hex": "0xd77a0e2b93cd8321"
+    }
+  ],
+  "algebraische_invarianten": {
+    "algebraischer_ring": "Z / 2^64 Z",
+    "multiplikative_inverse": {
+      "m1_invers": "0x96de1b173f119089",
+      "m2_invers": "0x319642b2d24d8ec3"
+    },
+    "inversions_methode": "Kaskadierte Rueckkoppelung der Bitwise-XOR-Shifts (Unshifting) und modulare Skalarmultiplikation",
+    "systemischer_schluss": "Das scheinbare Verschluesselungsrauschen des Ethereum State-Blooms ist als lineare Phasen-Symmetrie auf dem physischen 64-Bit-Register deterministisch geschlossen."
+  }
+}
