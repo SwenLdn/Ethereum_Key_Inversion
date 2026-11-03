@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "analyse_protokoll": {
+    "titel": "Nichtlineare Messwerkskennlinie, Stueckelungs-Metrologie und physisch-strukturelle Phasen-Symmetrie",
+    "status": "SYSTEM_RECORD_LOCKED",
+    "klassifikation": "Physisch-mechanische Randbedingungsanalyse"
+  },
+  "kalibrierungs_und_messdaten": {
+    "tara_offset_schale_gramm": 40.0,
+    "hersteller_vergleich_gesamtpackung": [
+      {
+        "marke": "Frosta",
+        "soll_gewicht_gramm": 500.0,
+        "bruttoanzeige_gramm": 580.0,
+        "netto_real_gramm": 540.0,
+        "differenz_absolut_gramm": 40.0,
+        "uebererfuellung_prozent": 8.0
+      },
+      {
+        "marke": "Iglo",
+        "soll_gewicht_gramm": 540.0,
+        "bruttoanzeige_gramm": 600.0,
+        "netto_real_gramm": 560.0,
+        "differenz_absolut_gramm": 20.0,
+        "uebererfuellung_prozent": 3.7
+      }
+    ],
+    "partikel_stueckungs_versuchsreihe": {
+      "iglo": [
+        {
+          "anzahl_pellets": 5,
+          "bruttoanzeige_gramm": 60.0,
+          "netto_anzeige_gramm": 20.0,
+          "berechnetes_stueckgewicht_gramm": 4.0,
+          "bereichsstatus": "UNTERHALB_ANSPRECHSCHWELLE",
+          "messfehler": "Stauchung durch Haftreibung/mechanische Ruhelage"
+        },
+        {
+          "anzahl_pellets": 7,
+          "bruttoanzeige_gramm": 110.0,
+          "netto_anzeige_gramm": 70.0,
+          "berechnetes_stueckgewicht_gramm": 10.0,
+          "bereichsstatus": "LINEARER_ARBEITSBEREICH",
+          "messfehler": "Nominal / Phasenstarr"
+        }
+      ],
+      "frosta": [
+        {
+          "anzahl_pellets": 5,
+          "bruttoanzeige_gramm": 120.0,
+          "netto_anzeige_gramm": 80.0,
+          "berechnetes_stueckgewicht_gramm": 16.0,
+          "bereichsstatus": "LINEARER_ARBEITSBEREICH",
+          "messfehler": "Stabil (Last uebersteigt Schwellenwert)"
+        },
+        {
+          "anzahl_pellets": 7,
+          "bruttoanzeige_gramm": 150.0,
+          "netto_anzeige_gramm": 110.0,
+          "berechnetes_stueckgewicht_gramm": 15.714,
+          "bereichsstatus": "LINEARER_ARBEITSBEREICH",
+          "messfehler": "Stabil"
+        }
+      ]
+    }
+  },
+  "mechanisch_metrologische_ableitungen": {
+    "ansprechschwellen_phaenomen": {
+      "prinzip": "Mechanische Hysterese und Federkonstanten-Nichtlinearitaet im Nullpunktbereich",
+      "nachweis": "Bei geringer Partikelmasse (Iglo 5 Stueck / 20 g Netto) reicht die Gravitationskraft nicht zur vollstaendigen Auslenkung des Messwerks aus. Das Signal kollabiert auf 4 g/Stueck. Erst ab 70 g Last wird der lineare Arbeitsbereich erreicht (10 g/Stueck)."
+    },
+    "fuellmengen_stueckelungs_gesetz": {
+      "prinzip": "Fertigpackungsverordnung (FPVO) vs. Einzelteil-Granularitaet",
+      "schlussfolgerung": "Je geringer das Einzelstueckgewicht im Verhaeltnis zur Gesamtmasse, desto hoeher die prozentuale Fertigungssicherheit/Ueberfuellung zur Vermeidung gesetzlicher Unterschreitungen."
+    }
+  },
+  "strukturelle_isomorphie_uebertragungs_helix": {
+    "stufenmodell": [
+      {
+        "phase": 1,
+        "bezeichnung": "Ansprechschwelle (Kompression / Rauschen)",
+        "kuechenwaage": "Federklemmung unterhalb Lastschwelle (5 Iglo = 4 g/Stueck)",
+        "biologie_kognition": "Reizschwelle des Aktionspotenzials im Neuron",
+        "sha256_register": "Bit-Shifts ohne Carry-Propagierung im LSB-Bereich"
+      },
+      {
+        "phase": 2,
+        "bezeichnung": "Linearer Arbeitsbereich (Phasenstarrheit)",
+        "kuechenwaage": "Konstante Messwertabbildung (7 Iglo = 10 g/Stueck, Frosta = 15,7 g/Stueck)",
+        "biologie_kognition": "Deterministische Signalweiterleitung",
+        "sha256_register": "Deterministische Permutation / Phasen-Schieberegister"
+      },
+      {
+        "phase": 3,
+        "bezeichnung": "Saettigung / Ueberlauf (Modulo-Limit)",
+        "kuechenwaage": "Mechanischer Endanschlag des Messaufnehmers",
+        "biologie_kognition": "Refraktaerphase",
+        "sha256_register": "Registerueberlauf und Faltung mod 2^32"
+      }
+    ],
+    "systemintegritaets_urteil": {
+      "kategorie": "Objektive Constraint-Validierung",
+      "befund": "Messabweichungen und Strukturbrueche sind ausnahmslos Resultate mechanisch-physikalischer oder algorithmischer Randbedingungen (Constraints). Die Umdeutung messbarer Vektor- und Phasen-Dissonanzen in psychologische Konstrukte stellt eine System-Interferenz und das Leugnen physikalischer Gesetzmaessigkeiten dar."
+    }
+  }
+}
