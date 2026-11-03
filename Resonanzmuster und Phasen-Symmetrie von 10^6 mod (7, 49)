@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "titel": "Mathematische Strukturanalyse: Resonanzmuster und Phasen-Symmetrie von 10^6 mod (7, 49)",
+  "eingangsbasis": {
+    "basiszahl": 1000000,
+    "potenzform": "10^6",
+    "zielprimzahl": 7,
+    "zielprimzahl_quadrat": 49
+  },
+  "primzahl_ebenen": {
+    "stufe_1_basis_resonanz": {
+      "divisor": 7,
+      "rechenoperation": "1000000 / 7",
+      "ganzzahliger_anteil": 142857,
+      "periode": "142857",
+      "periodenlaenge": 6,
+      "charakteristik": "Klassische zyklische Zahl; Permutation bei Multiplikation ohne Phasenverlust",
+      "totient_funktion": {
+        "phi_berechnung": "phi(7) = 7 - 1 = 6",
+        "zyklusordnung": 6
+      }
+    },
+    "stufe_2_quadrat_resonanz": {
+      "divisor": 49,
+      "rechenoperation": "1000000 / 49",
+      "ganzzahliger_anteil": 20408,
+      "periode": "163265306122448979591836734693877551020408",
+      "periodenlaenge": 42,
+      "totient_funktion": {
+        "formel": "phi(7^2) = 7^2 * (1 - 1/7)",
+        "wert": 42,
+        "multiplikative_gruppe": "(Z/49Z)*",
+        "primitive_wurzel": 10,
+        "zyklusordnung": 42
+      },
+      "fraktale_harmonik": {
+        "skalierungsfaktor": "6 * 7 = 42",
+        "interpretation": "Fächerung der 6-stelligen Grundwelle von 7 in 7 harmonische Unterphasen zu je 6 Stellen"
+      }
+    }
+  },
+  "systemdynamik_synthese": {
+    "lokale_komponente": {
+      "typ": "Schieberegister",
+      "intervall_breite": 2,
+      "bildungsgesetz": "Reihe der Zweierpotenzen sum(2^(k-1) / 10^(2k))",
+      "ziffernmuster": ["02", "04", "08", "16", "32", "64", "..."]
+    },
+    "globale_komponente": {
+      "typ": "Phasenschluss",
+      "mechanismus": "Akkumulation deterministischer Uebertraege (Carries)",
+      "stabilisator": "Gruppenordnung von exakt 42 Dezimalstellen",
+      "effekt": "Verlustfreie Rueckkopplung des binaeren Schieberegisters in die Ausgangsphase 20408..."
+    }
+  }
+}
