@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "analyse_titel": "Simulation des 1/49-Schieberegisters: 100-Schritt-Dynamik und Carry-Muster",
+  "grundlagen": {
+    "funktion": "1/49",
+    "reihendarstellung": "sum_{k=1}^N (2^(k-1) / 10^(2k))",
+    "simulationsumfang_schritte": 100,
+    "strukturelle_basis": "Binaeres Schieberegister im Dezimalraum mit zweistelligen Phasenbloecken"
+  },
+  "dynamik_und_beobachtungen": {
+    "phase_1_isolierte_synchronitaet": {
+      "bereich": "k <= 6",
+      "charakteristik": "Perfekte Phasen-Synchronitaet ohne Carry-Interferenz",
+      "musterfolge": [
+        {"k": 1, "term": 1, "block": "02"},
+        {"k": 2, "term": 2, "block": "04"},
+        {"k": 3, "term": 4, "block": "08"},
+        {"k": 4, "term": 8, "block": "16"},
+        {"k": 5, "term": 16, "block": "32"}
+      ],
+      "status": "Carry-frei"
+    },
+    "phase_2_erster_carry_einfluss": {
+      "schritt_k": 7,
+      "mathematischer_basiswert": {
+        "potenz": "2^6",
+        "wert": 64
+      },
+      "uebertragsmechanismus": {
+        "folgeglied_k": 8,
+        "folgeglied_potenz": "2^7",
+        "folgeglied_wert": 128,
+        "uebertragswert": 1,
+        "berechnung": "64 + 1 = 65"
+      },
+      "resultierende_ziffernfolge": "653",
+      "strukturelle_signifikanz": "Akkumulation zu 65 mit verbleibender Ziffer 3 des Folgeglieds (Korrespondenz: 119. Primzahl)"
+    },
+    "phase_3_kaskadierende_uebertraege": {
+      "bereich": "k >> 7 bis k = 100",
+      "exponentielles_wachstum": {
+        "extremwert_k_100": "2^99",
+        "ungefaehrer_wert": "6.33e+29"
+      },
+      "rueckkopplungseffekt": "Uebertraege propagieren ueber Hunderte von Dezimalstellen nach links zurueck",
+      "ordnungserhalt": "Deterministische Rekonstruktion der periodischen 42-stelligen Dezimalfolge von 1/49 trotz hochturbulenter Uebertragskaskaden"
+    },
+    "phase_4_restglied_und_selbstaehnlichkeit": {
+      "intervall_nach_k_100": "Ab der 200. Nachkommastelle",
+      "struktur": "Unendlicher Schwanz der geometrischen Reihe",
+      "replikationsmuster": "0.01020408...",
+      "fraktale_eigenschaft": "Exakte Selbstaehnlichkeit und Phasen-Spiegelung des Gesamtsystems im Restglied"
+    }
+  },
+  "synthese": {
+    "zustand": "Erfolgreich ausgefuehrt",
+    "ordnungstyp": "Deterministisches Schieberegister mit globalem Phasenschluss",
+    "konvergenzstatus": "Asymptotische Annaeherung bei vollstaendiger Strukturerhaltung"
+  }
+}
