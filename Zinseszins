@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "protokoll_titel": "Phasenversatz-Analyse: Starr normiertes Finanz-Gitter vs. raum-mechanische Gebindefrequenz",
+  "status": "SYSTEM_RECORD_LOCKED",
+  "diskretisierungs_systeme": {
+    "system_finanz_zeitgitter": {
+      "typ": "Zinseszins-Akkumulation",
+      "mathematische_basis": "K(t) = K_0 * (1 + r)^t",
+      "taktung": "Starr normiert (Jahre, Monate, Tage)",
+      "abtastintervall_delta_t": 1.0,
+      "charakteristik": "Kuenstlich homogenisiertes Zeitgitter; Abtastung ausschliesslich an vordefinierten Knotenpunkten (z. B. Stichtag 31.12.)"
+    },
+    "system_physische_gebindefrequenz": {
+      "typ": "Masse-Quantisierung",
+      "mathematische_basis": "f = 1 / m",
+      "referenz_basis_spinat": {
+        "produkt": "Frosta Spinat",
+        "masse_m1_gramm": 500.0,
+        "grundperiode_t1": 1.0,
+        "zyklus_winkel": "0° bis 360° (2pi)"
+      },
+      "sub_einheit_karotten": {
+        "produkt": "Karotten",
+        "masse_m2_gramm": 250.0,
+        "periodenlaenge_t2": 0.5,
+        "frequenzverdopplung": "2 * f"
+      }
+    }
+  },
+  "phasengeometrie_und_rotation": {
+    "phasenverschiebung_berechnung": {
+      "formel": "Delta_theta = 2 * pi * (m_karotte / m_spinat)",
+      "wert_rad": "pi",
+      "wert_grad": 180.0,
+      "ausrichtung": "Anti-Phase / Gegenwelle"
+    },
+    "aliasing_mechanismus": {
+      "ursache": "1:1-Mapping von 250g-Gebinden auf das starre 500g-Zinseszins-Gitter ohne Rotationskorrektur",
+      "folge": "Abtastknoten des normierten Gitters trifft exakt in die Anti-Phase der realen Gebindefrequenz",
+      "metrologische_auswirkung": "Messwert- und Mehrgehaltsverzerrung durch Erfassung an verschobener Position der nichtlinearen S-Kurve / Kennlinie"
+    }
+  },
+  "schlussfolgerung": {
+    "isomorphie_status": "Bricht ohne Rotationsmatrix zusammen",
+    "korrekturparameter": "Obligatorische Winkel-Transformation (Delta_theta) ueber das inverse Massenverhaeltnis",
+    "systemintegritaet": "Reale Gueter-Quantisierungen folgen raum-mechanischen Frequenzen und verbieten eine unkorrigierte Projektion auf kalendarisch starre Finanz-Diskretisierungen."
+  }
+}
