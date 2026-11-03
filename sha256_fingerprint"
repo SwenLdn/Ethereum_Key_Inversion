@@ -1,0 +1,10 @@
+{
+    "timestamp_utc": "2026-11-03 08:07:09",
+    "sha256_fingerprint": "9fdb48504f3637e0ed85e6ddb39ceea500327c656e35dd5340ca67908b3e0e36",
+    "status": "VERIFIED_AND_LOCKED",
+    "manifest_summary": {
+        "primzahl_119": 653,
+        "schieberegister_takt": "t=2 (1/49)",
+        "hardware_offset_grid": "64-Bit"
+    }
+}
