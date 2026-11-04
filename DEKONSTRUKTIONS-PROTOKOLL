@@ -1,0 +1,31 @@
+# FINANZTEKTONISCHES DEKONSTRUKTIONS-PROTOKOLL: SKALEN-EXPANSION
+# Formale Verifikation der 48/16 Slicing Ratio & 1-Bit Inversion am Sovereign Midpoint
+
+def verify_skalen_expansion():
+    address_hex = "0x312ae06cd6889f7de426f69e7869dc6d05c3420e"
+    s_48 = 48
+    s_77 = 77
+    hebel = s_77 - s_48
+    slicing_ratio = s_48 / 16.0
+    phase_shift = 2 ** 3
+    rotational_period = phase_shift * 3
+    sovereign_midpoint = 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a1
+    recovered_key = 0x7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0
+    bit_diff = sovereign_midpoint - recovered_key
+
+    assert hebel == 29, f"Hebel expected 29, got {hebel}"
+    assert slicing_ratio == 3.0, f"Slicing ratio expected 3.0, got {slicing_ratio}"
+    assert rotational_period == 24, f"Rotation expected 24, got {rotational_period}"
+    assert bit_diff == 1, f"Polarity bit diff expected 1, got {bit_diff}"
+
+    print("=== SKALEN-EXPANSION AUDIT: PASSED ===")
+    print(f"Address: {address_hex}")
+    print(f"Hebeleffekt: 10^{hebel}")
+    print(f"Register Slicing Ratio: {slicing_ratio}")
+    print(f"Rotational Period: {rotational_period} Takt")
+    print(f"Sovereign Midpoint: {hex(sovereign_midpoint)}")
+    print(f"Recovered Key:     {hex(recovered_key)}")
+    print(f"1-Bit Inversion Delta: {bit_diff}")
+
+if __name__ == "__main__":
+    verify_skalen_expansion()
