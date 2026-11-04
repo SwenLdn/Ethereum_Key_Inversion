@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kritische Infrastrukturen und kryptographische Abhängigkeiten",
+  "description": "Strukturelle Analyse der mathematischen Abhängigkeiten moderner Infrastruktursysteme von asymmetrischer Kryptographie (ECC/RSA) und kryptographischen Hashfunktionen (SHA-2/SHA-3).",
+  "systemic_premise": "Praktisch die gesamte moderne kritische Infrastruktur stützt sich direkt oder indirekt auf asymmetrische Kryptographie und kryptographische Hashfunktionen. Ohne diese mathematischen Primitive brechen Integrität, Authentifizierung und Vertraulichkeit dieser Systeme zusammen.",
+  "sectors": [
+    {
+      "sector_id": "finance",
+      "sector_name": "Banken und Finanzinfrastruktur",
+      "subsystems": [
+        {
+          "name": "Zahlungskarten & POS-Terminals (EMV-Standard)",
+          "algorithms": [
+            "ECC (secp256r1, Brainpool)",
+            "RSA (2048–4096 Bit)",
+            "SHA-256"
+          ],
+          "function": "Beim Bezahlen mit Chip oder NFC (Apple Pay, Google Pay, physische Debit-/Kreditkarte) führt der Chip einen kryptographischen Handshake mit dem Terminal durch (Combined DDA/AC – Dynamic Data Authentication / Application Cryptogram). Dabei signiert die Karte Transaktionsdaten mit einem privaten Schlüssel direkt auf dem Chip."
+        },
+        {
+          "name": "Interbanken-Netzwerke (SWIFT & SEPA)",
+          "algorithms": [
+            "RSA",
+            "ECC",
+            "HMAC",
+            "SHA-256",
+            "SHA-512"
+          ],
+          "function": "SWIFT-Nachrichten (MT/MX nach ISO 20022) werden nicht im Klartext vertraut. Jede Routing-Nachricht wird über Hardwaresicherheitsmodule (HSMs) digital signiert und gehasht, um Man-in-the-Middle-Manipulationen an Beträgen oder IBANs auszuschließen."
+        },
+        {
+          "name": "Online-Banking & APIs (PSD2 / Open Banking)",
+          "algorithms": [
+            "TLS 1.3 (ECDHE via X25519 oder secp256r1)",
+            "ECDSA",
+            "Ed25519",
+            "SHA-256"
+          ],
+          "function": "Der Zugriff über HTTPS nutzt zwingend elliptische Kurven (Elliptic Curve Diffie-Hellman Ephemeral), um Perfect Forward Secrecy zu gewährleisten. Selbst wenn der Bankschlüssel später kompromittiert wird, lässt sich der vergangene Datenverkehr nicht nachträglich entschlüsseln."
+        }
+      ]
+    },
+    {
+      "sector_id": "border_control",
+      "sector_name": "Grenzkontrolle & Reisedokumente (ePassports / eGates)",
+      "subsystems": [
+        {
+          "name": "Elektronische Reisepässe (ICAO Doc 9303 / MRTD)",
+          "algorithms": [
+            "ECC (ECDSA, ECDH / Brainpool-Kurven)",
+            "RSA",
+            "SHA-256"
+          ],
+          "function": "Im kontaktlosen RFID-Chip des Reisepasses sind biometrische Daten und Stammdaten gespeichert. Die Grenzkontrolle (eGate) verifiziert diese über drei Schutzmechanismen.",
+          "mechanisms": [
+            {
+              "mechanism_id": "PA",
+              "name": "Passive Authentication",
+              "description": "Die Daten auf dem Chip sind mit einer digitalen Signatur des Ausstellerstaates (Country Signing CA) versehen. Das Terminal prüft per Hash und ECDSA-Signatur, ob das Dokument unverändert ist."
+            },
+            {
+              "mechanism_id": "AA_CA",
+              "name": "Active Authentication / Chip Authentication",
+              "description": "Der Chip beweist per Challenge-Response mittels seines privaten ECC-Schlüssels, dass er kein geklonter Chip ist, ohne den privaten Schlüssel preiszugeben."
+            },
+            {
+              "mechanism_id": "TA",
+              "name": "Terminal Authentication",
+              "description": "Nur autorisierte Lesegeräte erhalten über ECC-Zertifikate Zugriff auf geschützte Daten wie Fingerabdrücke."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sector_id": "aviation",
+      "sector_name": "Luftfahrt & Flugzeugsicherheit",
+      "subsystems": [
+        {
+          "name": "ACARS & ATN/CPDLC (Kommunikation Cockpit – Fluglotse)",
+          "algorithms": [
+            "SHA-256",
+            "HMAC",
+            "ECC/RSA (ATN/IPS Übergang)"
+          ],
+          "function": "Bislang lief Flugfunk weitgehend unverschlüsselt (ADS-B ist bis heute offen). Moderne digitale Anweisungen (z. B. Kursänderungen via CPDLC über ATN) werden zunehmend kryptographisch signiert, um gefälschte Controller-Befehle (Spoofing) abzuwehren."
+        },
+        {
+          "name": "Avionik & Software-Updates für Flugzeuge",
+          "algorithms": [
+            "RSA",
+            "ECDSA",
+            "SHA-256",
+            "SHA-512",
+            "ARINC 827 / ARINC 835 Crate Standards"
+          ],
+          "function": "Jedes Software-Update, das in Bordcomputer (FADEC, Fly-by-Wire, Flight Management System) eingespielt wird, muss kryptographisch signiert sein. Das Flugzeug verifiziert die Signatur gegen in Hardware hinterlegte Root-Zertifikate, bevor eine Installation gestartet wird."
+        }
+      ]
+    },
+    {
+      "sector_id": "energy",
+      "sector_name": "Energiesektor & Smart Grids",
+      "subsystems": [
+        {
+          "name": "IEC 62351 & IEC 61850 (Schutz- und Steuertechnik in Umspannwerken)",
+          "algorithms": [
+            "TLS mit ECDHE",
+            "ECDSA",
+            "SHA-256",
+            "HMAC-SHA256"
+          ],
+          "function": "Fernwirkprotokolle (z. B. SCADA-Steuerung von Hochspannungsschaltern) müssen immun gegen Replay-Angriffe und Befehlsfälschung sein. Steuersignale werden mit Timestamps gehasht und mit ECC signiert."
+        },
+        {
+          "name": "Intelligente Messsysteme (Smart Meter Gateways / BSI-TR-03109)",
+          "algorithms": [
+            "ECC (brainpoolP256r1, brainpoolP384r1)",
+            "AES-GCM",
+            "SHA-256"
+          ],
+          "function": "Jedes Smart Meter Gateway besitzt ein eigenes Hardware-Sicherheitsmodul. Messdaten für Netzbetreiber werden Ende-zu-Ende verschlüsselt und signiert, sodass weder Ablesedienstleister noch unbefugte Dritte Einsicht in Lastprofile oder Steuerbefehle nehmen können."
+        }
+      ]
+    }
+  ],
+  "dependency_matrix": [
+    {
+      "sector": "Finanzen",
+      "direct_ecc_hash_application": "EMV-Chips, SWIFT-Signaturen, TLS-Banking",
+      "systemic_failure_risk": "Totaler Vertrauensverlust bei Buchungen, Kartendubletten, Ausfall des Zahlungsverkehrs"
+    },
+    {
+      "sector": "Grenze",
+      "direct_ecc_hash_application": "ICAO eGates, biometrische Pass-Signaturen",
+      "systemic_failure_risk": "Unmöglichkeit, gefälschte Pässe maschinell zu erkennen; Ausfall automatisierter Grenzkontrollen"
+    },
+    {
+      "sector": "Aviation",
+      "direct_ecc_hash_application": "Signierte Firmware, ATN-Nachrichtenintegrität",
+      "systemic_failure_risk": "Einschleusen manipulierter Software in Leit- und Steuersysteme von Flugzeugen"
+    },
+    {
+      "sector": "Energie",
+      "direct_ecc_hash_application": "SCADA-Netzschutz, Smart-Meter-PKI",
+      "systemic_failure_risk": "Physische Manipulation an Umspannwerken und Netzabschaltungen durch gefälschte Steuerbefehle"
+    }
+  ],
+  "structural_conclusion": "Obwohl die Anwendungslogik isoliert wirkt, hängt die gesamte Transportsicherung, Echtheitsbestätigung und Manipulationssicherheit lückenlos an genau denselben mathematischen Grundoperationen (diskreter Logarithmus auf elliptischen Kurven und Einweg-Hashfunktionen), die auch in der Blockchain-Architektur zum Einsatz kommen."
+}
