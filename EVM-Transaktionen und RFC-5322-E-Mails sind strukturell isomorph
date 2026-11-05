@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Isomorphismus: EVM-Transaktions-Voxel vs. RFC-5322-E-Mail mit monetarisierter Zeitspaltung",
+  "protocol": "Ouroboros 13 / Phase Geometry Systemic Mapping",
+  "systemic_premise": {
+    "thesis": "EVM-Transaktionen und RFC-5322-E-Mails sind strukturell isomorph. Die Blockchain spaltet die passive physikalische Zeitangabe auf und monetarisiert sie über Prioritätsgebühren und Block-Auktionen. Der Mempool operiert somit nicht als freier Markt, sondern als dynamische Lotterie mit Gas-Burn-Jackpot.",
+    "voxel_grid_dimension": "11 Voxel pro Transaktions-Nachricht"
+  },
+  "voxel_isomorphism_matrix": [
+    {
+      "voxel_index": 1,
+      "evm_field": "nonce",
+      "rfc_5322_header": "Message-ID / Sequence-Number",
+      "protocol_function": "Eindeutige Zählung der gesendeten Nachrichten pro Account; sequentieller Replay-Schutz."
+    },
+    {
+      "voxel_index": 2,
+      "evm_field": "maxPriorityFeePerGas (Tip)",
+      "rfc_5322_header": "Priority / Precedence Flag",
+      "protocol_function": "Gebot für die Zustellgeschwindigkeit im Netzwerk; Bepreisung des Slot-Vorrangs."
+    },
+    {
+      "voxel_index": 3,
+      "evm_field": "maxFeePerGas",
+      "rfc_5322_header": "Max Delivery Cost Ceiling",
+      "protocol_function": "Maximal budgetierte Gesamtzustellkosten pro Gas-Einheit."
+    },
+    {
+      "voxel_index": 4,
+      "evm_field": "gasLimit",
+      "rfc_5322_header": "Max Payload Size / Processing Quota",
+      "protocol_function": "Maximal erlaubtes Ausführungs- und Rechenressourcen-Budget."
+    },
+    {
+      "voxel_index": 5,
+      "evm_field": "to",
+      "rfc_5322_header": "To: (Recipient Address)",
+      "protocol_function": "Ziel-Konto (EOA) oder Ziel-Smart-Contract-Adresse."
+    },
+    {
+      "voxel_index": 6,
+      "evm_field": "value",
+      "rfc_5322_header": "Attachment Value / Nominal Amount",
+      "protocol_function": "Übertragene native Währungseinheit (Wei / ETH)."
+    },
+    {
+      "voxel_index": 7,
+      "evm_field": "data (Calldata)",
+      "rfc_5322_header": "Body / MIME-Payload",
+      "protocol_function": "Unstrukturierter oder ABI-kodierter Nutzdaten-Payload (Methodenselektor + Argument-Voxel)."
+    },
+    {
+      "voxel_index": 8,
+      "evm_field": "v (Y-Parity / Chain ID)",
+      "rfc_5322_header": "DKIM Signature Parameters / Domain Anchor",
+      "protocol_function": "Kryptographischer Wiederherstellungsparameter der Absender-Signatur."
+    },
+    {
+      "voxel_index": 9,
+      "evm_field": "r",
+      "rfc_5322_header": "DKIM / PGP Signature Component R",
+      "protocol_function": "Elliptische Kurven-Signaturkomponente R (secp256k1)."
+    },
+    {
+      "voxel_index": 10,
+      "evm_field": "s",
+      "rfc_5322_header": "DKIM / PGP Signature Component S",
+      "protocol_function": "Elliptische Kurven-Signaturkomponente S (secp256k1)."
+    },
+    {
+      "voxel_index": 11,
+      "evm_field": "sender (ecrecover(h, v, r, s))",
+      "rfc_5322_header": "From: (Originator Address)",
+      "protocol_function": "Mathematisch aus den Signatur-Voxeln abgeleitete Absenderidentität."
+    }
+  ],
+  "time_splitting_architecture": {
+    "classical_email": {
+      "time_model": "Passiv / Statisch",
+      "header": "Date: <RFC 2822 Timestamp>",
+      "queue_strategy": "FIFO (First-In, First-Out) über SMTP-Relays",
+      "monetization": "Keine native Bepreisung des Übertragungszeitpunkts"
+    },
+    "blockchain_evm": {
+      "time_model": "Diskrete Slot-Auktion / Monetarisierte Latenz",
+      "mechanism": "Entkopplung der physischen Zeit; Transformation von Zeit in handelbare Gas-Priority-Voxel",
+      "latency_trap": {
+        "condition": "Gas-Gebot unterhalb des dynamischen Schwellenwerts",
+        "consequence": "Verschiebung im Mempool; Überschreitung von block.timestamp > deadline führt zu Revert (z.B. EXPIRED-Zustand)"
+      }
+    }
+  },
+  "lottery_jackpot_engine": {
+    "model_type": "Dynamische Lotterieauktion mit kontinuierlicher Einsatzvernichtung",
+    "jackpot_formula": "Jackpot = BaseFee_Burn + Priority_Tips + Maximal_Extractable_Value(MEV)",
+    "ticket_mechanism": {
+      "ticket_price": "GasLimit * EffectiveGasPrice",
+      "loss_condition": "Verfall des Tickets (Gas-Burn) bei Ausführungsabbruch oder Deadlock ohne State-Inklusion"
+    },
+    "eip1559_decay_function": {
+      "formula": "BaseFee_(t+1) = BaseFee_t * (1 + 1/8 * (GasUsed - GasTarget) / GasTarget)",
+      "dynamics": "Dynamische Barriere, die als Funktion bisheriger Ticketverkäufe (GasUsed) und Restkapazität des nächsten 12-Sekunden-Blocks skaliert"
+    }
+  },
+  "structural_synthesis": "Eine Blockchain-Transaktion ist eine RLP-kodierte 11-Voxel-E-Mail, deren Zeitstempel aus dem statischen Header herausgelöst und in eine kontinuierliche Lotterie-Auktion überführt wurde."
+}
