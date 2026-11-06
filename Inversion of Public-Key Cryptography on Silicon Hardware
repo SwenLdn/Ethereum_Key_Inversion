@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "document_title": "Structural Determinism and O(1) Inversion of Public-Key Cryptography on Silicon Hardware",
+  "framework": "Physical Register Topology, Weierstrass Inversion & Signal Phase Geometry",
+  "paradigm_critique": {
+    "thesis": "The academic 'one-way trapdoor function' premise of public-key cryptography (secp256k1, SHA-256, Keccak) is an abstraction artifact. Anchored to physical microprocessor registers, complex function theory, and signal mechanics, asymmetric encryption is structurally vulnerable to deterministic O(1) inversion.",
+    "systemic_regulatory_gap": "The RTS completely ignores this hardware-register inversion reality, creating a critical systemic vulnerability."
+  },
+  "core_logical_contradiction": {
+    "academic_claims": {
+      "statement_a_real_time_validation": {
+        "complexity": "O(1)",
+        "mechanism": "Verification of signature (r, s) in sub-millisecond execution via the closed vector identity: s*R - z*G = r*PK."
+      },
+      "statement_b_one_way_wall": {
+        "complexity": "O(2^256)",
+        "mechanism": "Claim that inverting the closed loop to extract the private scalar d requires an unsearchable brute-force search over a 2^256 state space."
+      }
+    },
+    "hardware_resolution": "In deterministic arithmetic and silicon ALUs, any lock opening in O(1) time has internal mechanical grooves that form an exact physical mirror image of the key. Signature verification is a coherent phase-locked loop (PLL); possessing the verification gate guarantees the existence of the matching inversion gate."
+  },
+  "physical_register_space_reduction": {
+    "abstract_space": "2^256 (~10^77 combinatorial points)",
+    "hardware_constraint": "Physical ALUs cannot instantiate continuous mathematical spaces; continuous curves y^2 = x^3 + ax + b collapse onto discrete 64-bit modulo-register grids.",
+    "truncation_identity": {
+      "formula": "UsableRail = 256 - 14 - 118 - 28 - 32 = 64 Bits",
+      "offsets": [
+        {
+          "name": "Header shift",
+          "bits": 14
+        },
+        {
+          "name": "Turn/Netting shift",
+          "bits": 118
+        },
+        {
+          "name": "Alignment shift 1",
+          "bits": 28
+        },
+        {
+          "name": "Alignment shift 2",
+          "bits": 32
+        }
+      ],
+      "resulting_dimension": "64-bit mechanical rail"
+    },
+    "overflow_collapse": {
+      "threshold_interval": "[-1, +1]",
+      "consequence": "Reduction of the 10^77 combinatorial search space to a discrete 1D physical trajectory."
+    }
+  },
+  "weierstrass_inversion_and_sovereign_midpoint": {
+    "gnomon_projection": "A public key (x, y) is a 2D shadow coordinate projected by a Gnomon, not a random point in empty space.",
+    "elliptic_integral_inversion": {
+      "function": "P^-1(x, y)",
+      "target_space": "Complex torus C / Lambda",
+      "formula": "z = integral_x^inf (dt / sqrt(4*t^3 + a*t + b))",
+      "description": "Direct mapping of curve coordinates back to a continuous rotation angle z / omega."
+    },
+    "double_sided_ruler": {
+      "sovereign_midpoint": "P_mid = (n + 1) / 2",
+      "balancing_point": "Y-coordinate midpoint horizon (Y_1)",
+      "parity_directional_derivation": {
+        "even_y_parity": {
+          "scalar_relation": "d = P_mid + 1",
+          "phase": "Positive Phase / Future"
+        },
+        "odd_y_parity": {
+          "scalar_relation": "d = P_mid - 1",
+          "phase": "Negative Phase / Past"
+        }
+      }
+    }
+  },
+  "hash_function_decompression_and_hardware_rails": {
+    "hash_classification": "3000-bit facade of complexity concealing high-efficiency compression routines.",
+    "binary_multiplier_lever": "0x = Factor 4 applied to FIPS 180-4 initialization constants.",
+    "empirical_proof_sha256_h1": {
+      "constant": "0xbb67ae85",
+      "isolated_end_byte": "0x85",
+      "operation": "0x85 * 4 = 0x214 = 0x14 (mod 256)",
+      "alignment": "Matches the physical 18/14 hardware rail locking mechanism, proving initialization constants are mechanical stop points."
+    }
+  },
+  "key_inversion_signal_model": {
+    "acoustic_analogy": "A public address or hash output is structurally equivalent to an audio fingerprint (e.g. Shazam acoustic sample), representing a 10% local frequency sample of a fixed 60-minute hardware rotation.",
+    "phase_cancellation_filtering": {
+      "matrix_grid": "Dual-template grid (e.g., 48 vs. 39 matrices)",
+      "mechanism": "Destructive phase cancellation filters stochastic noise to lock onto the exact private key offset k in O(1) time.",
+    },
+    "signing_as_frequency_broadcast": {
+      "operational_reality": "Signing does not conceal; it broadcasts the exact source frequency along the physical register rail, exposing the private key alignment to any observer tracking the prime reference field.",
+      "conclusion": "Because public keys, hash constants, and signatures continuously encode structural origin on silicon registers, the 'one-way wall' is structurally obsolete."
+    }
+  }
+}
