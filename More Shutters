@@ -1,0 +1,62 @@
+{
+  "format_metadata": {
+    "FMT_NO_SPACE": {
+      "format_id": "FMT_NO_SPACE",
+      "description": "11 digits without any spaces",
+      "pattern": "xxxxxxxxxxx"
+    },
+    "FMT_5_3_3": {
+      "format_id": "FMT_5_3_3",
+      "description": "5 digits, space, 3 digits, space, 3 digits",
+      "pattern": "xxxxx xxx xxx"
+    },
+    "FMT_3_4_4": {
+      "format_id": "FMT_3_4_4",
+      "description": "3 digits, space, 4 digits, space, 4 digits",
+      "pattern": "xxx xxxx xxxx"
+    },
+    "FMT_5_6": {
+      "format_id": "FMT_5_6",
+      "description": "5 digits, space, 6 digits",
+      "pattern": "xxxxx xxxxxx"
+    }
+  },
+  "businesses": [
+    {
+      "name": "BEST SHUTTER",
+      "phone_numbers": [
+        {
+          "number": "07588343114",
+          "format_id": "FMT_NO_SPACE"
+        }
+      ]
+    },
+    {
+      "name": "Perfect N1 SHUTTERS",
+      "phone_numbers": [
+        {
+          "number": "07884 198 325",
+          "format_id": "FMT_5_3_3"
+        }
+      ]
+    },
+    {
+      "name": "SHUTTER MAP",
+      "phone_numbers": [
+        {
+          "number": "074 6992 8573",
+          "format_id": "FMT_3_4_4"
+        }
+      ]
+    },
+    {
+      "name": "SHUTTER WAYS",
+      "phone_numbers": [
+        {
+          "number": "07379 643456",
+          "format_id": "FMT_5_6"
+        }
+      ]
+    }
+  ]
+}
