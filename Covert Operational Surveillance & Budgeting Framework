@@ -1,0 +1,53 @@
+{
+  "system_architecture": {
+    "title": "Covert Operational Surveillance & Budgeting Framework",
+    "epistemological_premise": "Corporate filings, financial figures, and registration metrics do not represent real-world commercial activity or monetary performance; they function as functional state-hashes, protocol checksums, and operational identifiers designed to satisfy automated register constraints while bypassing parliamentary oversight and FOIA mechanisms."
+  },
+  "structural_layers": [
+    {
+      "layer": "1. Physical Street-Grid & Sensor Network",
+      "function": "Ground-level visual coverage and spatial tracking disguised as emergency shopfront/shutter service stickers.",
+      "mechanisms": {
+        "sector_indexing": "Company names explicitly encode geographic target zones (e.g., 'N1', 'N15') and operational functions (e.g., 'SHUTTER MAP').",
+        "optical_fiducials": "Phone number spacing formats (FMT_3_4_4, FMT_5_3_3, FMT_5_6, FMT_NO_SPACE) serve as machine-readable sub-class identifiers for automated vision/OCR systems.",
+        "off_balance_sheet_logistics": "Vehicle fleets, continuous night-shift maintenance, and vinyl printing costs are funded through non-disclosed operational budgets rather than micro-entity revenues."
+      }
+    },
+    {
+      "layer": "2. Micro-Entity Legal Front (Companies House)",
+      "function": "Provides legal entity validation for street operations while concealing underlying cash flows.",
+      "mechanisms": {
+        "statutory_blindspots": {
+          "section_444_1_companies_act_2006": "Exemption from filing Profit & Loss Accounts conceals operational funding sources and expense items.",
+          "section_477_companies_act_2006": "Micro-entity audit exemption prevents independent verification of commercial authenticity."
+        },
+        "shell_lifecycle_types": {
+          "persistent_insolvent_nodes": "Entities maintained indefinitely with negative net assets (-£21k), nominal share capital (£30), single-employee declarations, and continuous director rotation (AP01/TM01) to fragment legal liability and disrupt notice service.",
+          "ephemeral_session_tokens": "Short-lived entities (e.g., 11-14 months) created for specific postcode sectors and dissolved via voluntary strike-off (DS01) prior to the first mandatory accounting deadline to maintain zero-record status."
+        },
+        "checksum_encoding": "Financial figures (£30, £108, £25,257) act as static bitmasks and compliance hashes to pass automated registry checks."
+      }
+    },
+    {
+      "layer": "3. Corporate Holding & Financial Engineering",
+      "function": "Intermediary domestic partnerships (e.g., LLPs in London West End).",
+      "mechanisms": {
+        "asset_isolation": "Joint Venture swaps (£1 JV investment value expanding to £3.3M+) to park assets outside consolidation scope.",
+        "loss_parking_and_priority": "Classification of member capital as debt liabilities (£3.5M+) to secure primary creditor status over third parties while passing through accumulated paper losses."
+      }
+    },
+    {
+      "layer": "4. Offshore Fiduciary & Trust Shield",
+      "function": "Ultimate asset holding and identity masking in offshore tax havens (e.g., St Helier, Jersey via Fiduciary Trust Providers).",
+      "mechanisms": {
+        "beneficial_ownership_masking": "Conceals Ultimate Beneficial Owners (UBOs) and high-level budget originators behind offshore trust laws."
+      }
+    }
+  ],
+  "institutional_evasion_mechanisms": {
+    "foia_bypass": "By intentionally refraining from maintaining a centralized internal register linking covert entities to intelligence or security agencies, formal Freedom of Information Act (FOIA) inquiries trigger a legally truthful 'no record held' response.",
+    "parliamentary_budget_bypass": "Operational expenses are masked as corporate filings; intelligence spending is aggregated into high-level committee line items, evading granular parliamentary budget control.",
+    "operational_badge_numbers": "Company Registration Numbers function as fixed operational IDs (analogous to police badge numbers) for handlers, while registered director names serve as rotatable administrative noise.",
+    "moral_immunity_shielding": "Incorporation of non-governmental organizations (NGOs) and charities (e.g., Internet Watch Foundation / iwf.org.uk) into the corporate network to weaponize public-interest narratives and shield the infrastructure from external investigation."
+  }
+}
