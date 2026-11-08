@@ -1,0 +1,23 @@
+{
+  "operation_types": [
+    {
+      "name": "Barium Meal Test",
+      "german_name": "Barium-Mahlzeit-Test",
+      "origin": {
+        "context": "Britische Geheimdienst-Kreise (MI5/MI6)",
+        "reference": "Enthüllungsbuch 'Spycatcher' von Peter Wright"
+      },
+      "metaphor": "In der Medizin schlucken Patienten ein Barium-Kontrastmittel, damit Ärzte den Weg der Nahrung im Röntgenbild genau verfolgen können.",
+      "espionage_method": "Man füttert eine Zielperson oder einen potenziellen Maulwurf mit einer ganz bestimmten, brisanten (oft falschen oder manipulierten) Information. Sobald diese Information beim Gegner oder in den Medien auftaucht, leuchtet der Weg des Verrats wie auf einem Röntgenbild auf – der Gegner hat „den Köder geschluckt“ und sich verraten."
+    },
+    {
+      "name": "Canary Trap",
+      "german_name": "Kanarienvogel-Falle",
+      "origin": {
+        "context": "Britische Geheimdienst-Kreise (Filme und Realität)"
+      },
+      "relationship_to_barium_meal_test": "Sehr ähnliches Prinzip mit detaillierten Nuancen."
+    }
+  ],
+  "sources": [1, 2]
+}
