@@ -1,0 +1,106 @@
+import hashlib
+import pandas as pd
+import numpy as np
+
+class CovertAgent:
+    def __init__(self, name_noise, badge_id, num_appointments):
+        # Der Name ist reines Rauschen (Noise)
+        self.name_noise = name_noise
+        # Die Company Number fungiert als unveränderliche Dienstnummer
+        self.badge_id = badge_id
+        self.num_appointments = num_appointments
+        self.role = "Operational Handler (Teamleiter)" if num_appointments >= 50 else "Field Agent"
+
+class AddressHoppingRouter:
+    def __init__(self):
+        # Simuliert das Äquivalent zu Tor-IP-Hopping im physischen Londoner Adressgitter
+        self.routing_path = [
+            "64 Ashton Gardens, Romford, Essex, RM6 6RT",
+            "33 Margaret St, London, W1G 0JD (West End)",
+            "Old Bailey, London, EC4M 7EH (Gerichtsbezirk)",
+            "Birmingham Transit Hub, B1 1QU",
+            "Edinburgh Castle Ridge, EH1 2NG",
+            "Sussex Covert Depot, BN1 1AL"
+        ]
+
+    def get_current_node(self, operational_step):
+        idx = operational_step % len(self.routing_path)
+        return self.routing_path[idx]
+
+class FOIABypassController:
+    def __init__(self, use_central_register=False):
+        self.use_central_register = use_central_register
+        self.covert_companies = {
+            "10143153": "EMERGENCY SHOPFITTERS LTD",
+            "09770000": "RIGHT WAY SHOPFITTER",
+            "OC413480": "FB BCR LLP"
+        }
+
+    def handle_foia_request(self, query_company_number):
+        """
+        Simuliert den gesetzlichen FOIA-Bypass.
+        Ohne Zentralregister ist die Antwort der Behörde legal 'We hold no record'.
+        """
+        if not self.use_central_register:
+            # Da kein internes Register gepflegt wird, um FOIA-Anfragen zu unterwandern
+            return {
+                "FOIA_Response": "We hold no record of such covert operations under this department.",
+                "Legal_Status": "SUCCESSFUL BYPASS",
+                "Friction_Cost": 0.0
+            }
+        else:
+            # Wenn ein zentrales Register existieren würde (Gefahr der Aufdeckung)
+            company_name = self.covert_companies.get(query_company_number, "Unknown")
+            return {
+                "FOIA_Response": f"Access Granted: {company_name} is registered as Covert Operation Alpha.",
+                "Legal_Status": "EXPOSED / PUBLIC DISCUSSION REQUIRED",
+                "Friction_Cost": 1.0
+            }
+
+class CovertSystemSimulator:
+    def __init__(self):
+        self.router = AddressHoppingRouter()
+        self.foia_bypass = FOIABypassController(use_central_register=False)
+        self.charity_shield_active = True
+        self.charity_domain = "iwf.org.uk" # Internet Watch Foundation
+
+    def run_simulation(self, steps=4):
+        audit_log = []
+        
+        # Simuliere die Akteure
+        agents = [
+            CovertAgent("SINGH, Satinderdeep", "10143153", 95),
+            CovertAgent("KAUR, Lakhvir", "10143153", 2),
+            CovertAgent("SINGH, Kirpal", "10143153", 1)
+        ]
+
+        for step in range(steps):
+            active_agent = agents[step % len(agents)]
+            current_address = self.router.get_current_node(step)
+            
+            # Berechne den deterministischen Operations-Hash
+            op_hash = hashlib.sha256(f"{active_agent.badge_id}|{current_address}".encode()).hexdigest()[:16]
+            
+            # Anfrage über den FOIA-Bypass
+            foia_res = self.foia_bypass.handle_foia_request(active_agent.badge_id)
+
+            audit_log.append({
+                "Operations_Schritt": step + 1,
+                "Agent (Name-Rauschen)": active_agent.name_noise,
+                "Dienstnummer (Company Number)": active_agent.badge_id,
+                "Rangstufe": active_agent.role,
+                "Aktiver Operations-Standort": current_address,
+                "Sicherheits-Token (SHA-256)": op_hash,
+                "Zentrales Register vorhanden": "NEIN (Systemschutz)",
+                "FOIA-Auskunftsstatus": foia_res["FOIA_Response"],
+                "Charity-Immunität (iwf.org.uk)": "AKTIV (Kritik-Blockade)" if self.charity_shield_active else "INAKTIV"
+            })
+
+        return pd.DataFrame(audit_log)
+
+# --- Simulation ausführen ---
+simulator = CovertSystemSimulator()
+df_covert_audit = simulator.run_simulation(steps=5)
+
+pd.set_option('display.max_colwidth', None)
+display(df_covert_audit)
