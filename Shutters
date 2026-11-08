@@ -1,0 +1,101 @@
+{
+  "format_metadata": {
+    "FMT_3_4_4": {
+      "format_id": "FMT_3_4_4",
+      "description": "3 digits, space, 4 digits, space, 4 digits",
+      "pattern": "xxx xxxx xxxx"
+    },
+    "FMT_5_3_3": {
+      "format_id": "FMT_5_3_3",
+      "description": "5 digits, space, 3 digits, space, 3 digits",
+      "pattern": "xxxxx xxx xxx"
+    },
+    "FMT_4_3_4": {
+      "format_id": "FMT_4_3_4",
+      "description": "4 digits, space, 3 digits, space, 4 digits",
+      "pattern": "xxxx xxx xxxx"
+    },
+    "FMT_NO_SPACE": {
+      "format_id": "FMT_NO_SPACE",
+      "description": "11 digits without any spaces",
+      "pattern": "xxxxxxxxxxx"
+    }
+  },
+  "businesses": [
+    {
+      "name": "RIGHT WAY SHOPFITTER",
+      "phone_numbers": [
+        {
+          "number": "074 0000 7575",
+          "format_id": "FMT_3_4_4"
+        }
+      ]
+    },
+    {
+      "name": "First London SHOPFRONTS & SHUTTER",
+      "phone_numbers": [
+        {
+          "number": "07865 023 565",
+          "format_id": "FMT_5_3_3"
+        }
+      ]
+    },
+    {
+      "name": "ESL EMERGENCY SHOPFITTERS LTD",
+      "phone_numbers": [
+        {
+          "number": "0739 275 9028",
+          "format_id": "FMT_4_3_4"
+        },
+        {
+          "number": "0758 416 1645",
+          "format_id": "FMT_4_3_4"
+        }
+      ]
+    },
+    {
+      "name": "BMC SHUTTERS",
+      "phone_numbers": [
+        {
+          "number": "07342642010",
+          "format_id": "FMT_NO_SPACE"
+        }
+      ]
+    },
+    {
+      "name": "RECOMMENDED SHUTTERS",
+      "phone_numbers": [
+        {
+          "number": "07405271571",
+          "format_id": "FMT_NO_SPACE"
+        }
+      ]
+    },
+    {
+      "name": "BESPOKE SHOPFRONT & SHUTTERS",
+      "phone_numbers": [
+        {
+          "number": "07863000305",
+          "format_id": "FMT_NO_SPACE"
+        },
+        {
+          "number": "07956350752",
+          "format_id": "FMT_NO_SPACE"
+        }
+      ]
+    },
+    {
+      "name": "G7 Shutter",
+      "phone_numbers": [
+        {
+          "number": "075 7643 4533",
+          "format_id": "FMT_3_4_4"
+        },
+        {
+          "number": "074 2453 2054",
+          "format_id": "FMT_3_4_4"
+        }
+      ]
+    }
+  ]
+}
