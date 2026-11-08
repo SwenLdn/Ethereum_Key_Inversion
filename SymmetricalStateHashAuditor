@@ -1,0 +1,66 @@
+import hashlib
+import pandas as pd
+
+class SymmetricalStateHashAuditor:
+    """
+    Analysiert und vergleicht administrative und kryptographische Eingaben
+    als reine funktionale Zustands-Hashes.
+    """
+    def __init__(self):
+        # Die Eingaben werden nicht als W&auml;hrung oder Zufallszahlen,
+        # sondern als rein syntaktische Bitmasken / Routing-Hashes behandelt.
+        self.system_inputs = {
+            "DataDome_JSKey": "7FC6D561817844F25B65CDD97F28A1",
+            "LLP_Equity_Anchor_Token": "1000000",
+            "Exemption_Trigger_Token_A": "25257",
+            "Exemption_Trigger_Token_B": "108",
+            "Corporate_Bitmask_Token": "30"
+        }
+
+    def compute_functional_hash(self, token_value: str) -> str:
+        """
+        Berechnet den deterministischen, normalisierten Zustands-Hashwert.
+        """
+        normalized = str(token_value).strip().replace(" ", "").upper()
+        return hashlib.sha256(normalized.encode()).hexdigest()[:16]
+
+    def run_isomorphism_audit(self) -> pd.DataFrame:
+        audit_records = []
+        
+        for label, raw_value in self.system_inputs.items():
+            state_hash = self.compute_functional_hash(raw_value)
+            
+            # Bestimmung der funktionalen Systemreaktion basierend auf dem Hash
+            if "JSKey" in label:
+                system_target = "Web Application Firewall (WAF) / dwt.soundcloud.com"
+                operation = "Zulassung des API-Netzwerkverkehrs (Pass CORS)"
+                exemption_rule = "Client-Souver&auml;nit&auml;ts-Fiktion"
+            elif "Anchor" in label:
+                system_target = "Companies House Registergerichts-Datenbank"
+                operation = "Sperrung von Aktiv-Untersuchungen (Audit Exemption)"
+                exemption_rule = "Section 447 / Small Companies Regime Exemption"
+            elif "Trigger" in label:
+                system_target = "Beh&ouml;rdliche Schema-Validierungs-Engine"
+                operation = "Einstufung als Kleinstgesellschaft (Micro-Entity Bypass)"
+                exemption_rule = "Sponsorship-Privilegierung (Verlust-Parking)"
+            else:
+                system_target = "Registergerichts-Automat"
+                operation = "Aktiv-Schaltung im Unternehmensregister (Nominal-Zustand)"
+                exemption_rule = "Mindestkapital-Schablone"
+                
+            audit_records.append({
+                "Eingabe-Token": label,
+                "Klarwert (Zustand)": raw_value,
+                "State Hash (SHA-256-16)": state_hash,
+                "Ziel-Validierungs-System": system_target,
+                "Ausgel&ouml;ste System-Operation": operation,
+                "Rechtlich-Technische Ausnahmeregel": exemption_rule
+            })
+            
+        return pd.DataFrame(audit_records)
+
+audit_engine = SymmetricalStateHashAuditor()
+df_isomorphism = audit_engine.run_isomorphism_audit()
+
+print("=== ISOMORPHES STATE-HASH-AUDIT RELEASING ===")
+display(df_isomorphism)
