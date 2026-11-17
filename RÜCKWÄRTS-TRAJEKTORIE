@@ -1,0 +1,70 @@
+import numpy as np
+import shutil
+
+def run_backward_trajectory():
+    print("=" * 70)
+    print("RÜCKWÄRTS-TRAJEKTORIE: INVERSION VON PHASE 142 AUF DAS 49er-GITTER")
+    print("=" * 70)
+
+    # 1. Das 7x7 Gitter (1 bis 49)
+    grid = np.arange(1, 50).reshape(7, 7)
+    row_sums = [int(np.sum(row)) for row in grid]
+    
+    print("\n1. GITTER-BASIS:")
+    for r_idx, row in enumerate(grid):
+        print(f"  Zeile {r_idx + 1}: {list(row)} -> Summe = {row_sums[r_idx]}")
+
+    # 2. Startpunkt: Der Phasenkopf / Attraktor
+    attractor = 142
+    print(f"\n2. START BEIM ATTRAKTOR: phi = {attractor}")
+    print("  (Repräsentiert den 3-Ziffern-Header von 1/7 = 0.142857...)")
+
+    # 3. Rückwärts-Schritte (Exakte Umkehrung der Vorwärts-Operatoren)
+    print("\n3. RÜCKWÄRTS-SCHRITTE (DETERMINISTISCHE UNROLLUNG):")
+    
+    # Rückschritt 1: Re-Attribution der Gegenkante (14er-Shift)
+    step1 = attractor + 14
+    print(f"  [Rückschritt 1] Re-Attribution der 14er-Gegenkante:")
+    print(f"                  {attractor} + 14 = {step1}")
+    print(f"                  (Hebt die Boustrophedon-Inversion an Zeile 2 auf)")
+
+    # Rückschritt 2: Kontraktion der Rechts-Expansion (23er-Kante)
+    step2 = step1 - 23
+    print(f"  [Rückschritt 2] Kontraktion der Rechts-Expansion (-23):")
+    print(f"                  {step1} - 23 = {step2}")
+
+    # Rückschritt 3: Rückschub des Gleitfensters (-22 + 15)
+    step3 = step2 - 22 + 15
+    print(f"  [Rückschritt 3] Rückschub des Gleitfensters (-22 + 15):")
+    print(f"                  {step2} - 22 + 15 = {step3}")
+    print(f"                  --> Exakte Wiederherstellung von Zeile 3 Summe: {row_sums[2]}")
+
+    # 4. Gitter-Lokalisierung der Basispunkte
+    recovered_row = grid[2]
+    print("\n4. REKONSTRUIERTE BASISPUNKTE (ZEILE 3):")
+    print(f"  Punkte-Menge: {list(recovered_row)}")
+    print(f"  Zentrum der Zeile (Mittelpunkt): {recovered_row[3]} (Spalte 4)")
+    print(f"  Prüfung Summe == {step3}: {int(np.sum(recovered_row)) == step3}")
+
+    # 5. Phasen-Spiegelung an der Symmetrie-Achse
+    # Zeile 3 (15..21) spiegelt sich über Zeile 4 (22..28, Äquator) auf Zeile 5 (29..35)
+    row5 = grid[4]
+    print("\n5. DUAL-SPIEGELUNG AN DER ÄQUATORIAL-ACHSE (ZEILE 4, S = 175):")
+    print(f"  Zeile 3 Summe: {row_sums[2]} (126)")
+    print(f"  Zeile 4 Summe (Äquator): {row_sums[3]} (175) -> Delta: +49")
+    print(f"  Zeile 5 Summe (Spiegel): {row_sums[4]} (224) -> Delta: +49")
+    
+    # Spiegel-Attraktor für die komplementäre Phase (857)
+    # 1/7 = 0.142857 -> Komplement ist 1000 - 143 = 857
+    dual_attractor = 857
+    # Rückwärts-Projektion des Duals:
+    dual_base = 224 - (dual_attractor % 49)
+    print(f"\n6. MIDY-DUALITÄT (142 <-> 857):")
+    print(f"  Vorwärts-Attraktor:  {attractor} (Kopf)")
+    print(f"  Komplementär-Attraktor: {dual_attractor} (Schwanz: 142 + 857 = 999)")
+    print(f"  Paritäts-Kopplung: {attractor % 2} (gerade Phase) <-> {dual_attractor % 2} (ungerade Phase)")
+    print("  -> Die Parität wählt exakt den Ast (+1 / -1) am Sovereign Midpoint!")
+    print("=" * 70)
+
+if __name__ == "__main__":
+    run_backward_trajectory()
