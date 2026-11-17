@@ -1,0 +1,63 @@
+import hashlib
+import hmac
+import secrets
+
+
+# 1. Schlüsselpaar erzeugen (Bitstring -> Public Key)
+def generate_keypair():
+    private_key = secrets.token_hex(32)  # 256-Bit geheimer Bitstring
+    public_key = hashlib.sha256(private_key.encode()).hexdigest()[:16]
+    return private_key, public_key
+
+
+# 2. Transaktion signieren (Beweis, dass die CPU den Bitstring kennt)
+def sign_shift(private_key, from_pub, to_pub, amount):
+    message = f"{from_pub}->{to_pub}:{amount}".encode()
+    return hmac.new(private_key.encode(), message, hashlib.sha256).hexdigest()
+
+
+# 3. Das "globale verteilte Array" (kein Objekt, keine Sache, nur Integer pro Zeile)
+ledger = {}
+
+
+# Initialzustand ("Do Kwon / Genesis setzt Zeilenwerte")
+priv_kwon, pub_kwon = generate_keypair()
+priv_novogratz, pub_novogratz = generate_keypair()
+priv_investor, pub_investor = generate_keypair()
+
+ledger[pub_kwon] = 200
+ledger[pub_novogratz] = 1
+ledger[pub_investor] = 0
+
+print("Zustand 0 (Initial):", ledger)
+
+
+# 4. Zustandsübergang ("Shift von Integer-Werten zwischen Zeilen")
+def shift_integer(from_pub, to_pub, amount, priv_key, signature):
+    # Prüfung 1: Passt der geheim gehaltene Bitstring zur Zeile?
+    if hashlib.sha256(priv_key.encode()).hexdigest()[:16] != from_pub:
+        raise PermissionError("Ungültiger Bitstring für diese Zeile.")
+
+    # Prüfung 2: Ist die Signatur gültig?
+    expected_sig = sign_shift(priv_key, from_pub, to_pub, amount)
+    if not hmac.compare_digest(signature, expected_sig):
+        raise PermissionError("Ungültige Signatur.")
+
+    # Prüfung 3: Reicht der Integer-Wert in der Quellzeile?
+    if ledger.get(from_pub, 0) < amount:
+        raise ValueError("Nicht genug Integer-Einheiten in der Zeile.")
+
+    # Die eigentliche "Eigentumsübertragung": Subtraktion und Addition
+    ledger[from_pub] -= amount
+    ledger[to_pub] = ledger.get(to_pub, 0) + amount
+
+
+# Schritt 1: Kwon verschiebt 100 Einheiten an Novogratz (A:B wird 100:101)
+sig1 = sign_shift(priv_kwon, pub_kwon, pub_novogratz, 100)
+shift_integer(pub_kwon, pub_novogratz, 100, priv_kwon, sig1)
+print("Zustand 1 (nach Shift 100):", ledger)
+
+# Schritt 2: Novogratz verkauft 98 Einheiten weiter an einen Investor
+sig2 = sign_shift(priv_novogratz, pub_novogratz, pub_investor, 98)
+shift_integer(pub_novogratz, pub_investor, 98, priv_novogratz, sig2)
+print("Zustand 2 (nach Shift 98):", ledger)
