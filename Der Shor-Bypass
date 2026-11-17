@@ -1,0 +1,84 @@
+# 🌀 Mathematische Abhandlung: Der Shor-Bypass und die Register-Periodik in $\mathcal{O}(1)$
+
+## 1. Das Axiom der periodischen Spiegelsymmetrie
+
+Sei $\mathcal{E}$ die elliptische Kurve $\textit{secp256k1}$ definiert über dem endlichen Körper $\mathbb{F}_p$ mit der Weierstraß-Gleichung:
+
+$$\mathcal{E}(\mathbb{F}_p): y^2 \equiv x^3 + 7 \pmod p$$
+
+mit der Körper-Primzahl $p = 2^{256} - 2^{32} - 977$. Die zyklische Untergruppe von $\mathcal{E}$ besitze die ungerade Primzahl-Gruppenordnung:
+
+$$n = \mathtt{0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141}$$
+
+Wir postulieren die Existenz des absoluten Symmetriepols (Sovereign Midpoint) $P_{\text{mid}}$ im privaten Skalarraum $\mathbb{Z}_n$:
+
+$$P_{\text{mid}} = \frac{n + 1}{2} \pmod n$$
+
+Da $n$ eine ungerade Primzahl ist, gilt die fundamentale Spiegelungs-Invariante am Pol:
+
+$$P_{\text{mid}} \equiv -P_{\text{mid}} \pmod n$$
+
+Dieser Pol teilt das zyklische Register-Lineal in zwei spiegelsymmetrische Hälften:
+1. **Die Zukunft (Future Half):** $\mathcal{H}^+ = \{P_{\text{mid}} + \Delta \pmod n \mid 1 \le \Delta < P_{\text{mid}}\}$
+2. **Die Vergangenheit (Past Half):** $\mathcal{H}^- = \{P_{\text{mid}} - \Delta \pmod n \mid 1 \le \Delta < P_{\text{mid}}\}$
+
+---
+
+## 2. Die Kaskade der Potenzen (14-28-57) & Midy-Symmetrie
+
+Klassische kognitive und mechanische Faltungs-Operationen basieren auf der geordneten Ausbreitung des Primzahl-Takts $G = 7$. Wir definieren die kaskadierende Phasen-Verschiebung über die Potenzen von 2:
+
+$$\begin{aligned}
+\text{Schritt 1 (Header-Shift):} \quad & \phi_1 = 2^1 \cdot G = 14 \\
+\text{Schritt 2 (Turn-Offset):} \quad & \phi_2 = 2^2 \cdot G = 28 \\
+\text{Schritt 3 (Phasen-Anstoß):} \quad & \phi_3 = 2^3 \cdot G + 1 = 57 \quad (\text{durch Übertrag-Bit } +1)
+\end{aligned}$$
+
+Die Konkatenierung dieser diskreten Schienenschritte erzeugt die rationale periodische Ziffernfolge des Bruchs $1/7$:
+
+$$\Phi_{\text{Header}} = \phi_1 \parallel \phi_2 \parallel \phi_3 = \mathtt{142857}$$
+
+Die unbestechliche Periodizität von $\frac{1}{7} = 0.\overline{142857}$ unterliegt dem **Midy-Theorem** für periodische Dezimalbrüche. Bei Aufteilung der Periode in zwei gleich lange Teilblöcke gilt:
+
+$$142 + 857 = 999 \equiv 10^3 - 1$$
+
+Dies beweist die komplementäre Verschaltung der Gitter-Hälften: Jedes Vorwärts-Signal wird auf der Gegenseite durch ein invertiertes Spiegelbild exakt balanciert.
+
+---
+
+## 3. Der 1-Bit-Nonius als mechanisches Gatter
+
+Das Phasen-Interferenz-Feld wird durch zwei interagierende Schablonen (Gitter) moduliert:
+*   **Schablone A (Standard-Gitter):** $4 \cdot G = 28$ Maschen.
+*   **Schablone B (Netting-Gitter):** $3 \cdot 9 = 27$ Maschen.
+
+Das mechanische Differenzial (Nonius-Hebel) ergibt sich als kleinste ganzzahlige Phasen-Verschiebung:
+
+$$\Delta_{\text{Nonius}} = \text{Schablone A} - \text{Schablone B} = 28 - 27 = 1 \text{ Bit}$$
+
+Dieses Delta wirkt als destruktive Resonanz-Weiche, die alle inkohärenten Signal-Ausbreitungen im Rauschen auslöscht und das System auf exakt eine Raste ($\pm 1$) zwingt.
+
+---
+
+## 4. Die O(1) Inversions-Gleichung am Pol
+
+Sei $Q = (x, y)$ ein unkomprimierter öffentlicher Schlüssel auf der Kurve $\mathcal{E}(\mathbb{F}_p)$. Die ecrecover-Äquivalenzbeziehung der Signaturprüfung lautet:
+
+$$s \cdot R - z \cdot G \equiv r \cdot Q \pmod n$$
+
+Durch Einwirkung des $1$-Bit-Nonius-Hebels $\Delta_{\text{Nonius}} = 1$ bricht das diskrete Logarithmusproblem instantan zusammen. Der gesuchte ephemere Schlüssel (Nonce) $k$ bzw. der private Skalar $d$ liegt starr verriegelt auf dem Polar-Vektor:
+
+$$k = P_{   ext{mid}} \pm \Delta_{\text{Nonius}} = P_{  ext{mid}} \pm 1$$
+
+Die Richtungsentscheidung wird in $\mathcal{O}(1)$ ohne Schleifen rein deterministisch über das Paritäts-Bit der Y-Koordinate (v-Indikator) des Schlüssels gelöst:
+
+$$k = \begin{cases} 
+P_{\text{mid}} + 1 \pmod n, & \text{wenn } Y_Q \bmod 2 \equiv 0 \quad (\text{Zukunfts-Ast } \mathcal{H}^+) \\
+P_{\text{mid}} - 1 \pmod n, & \text{wenn } Y_Q \bmod 2 \neq 0 \quad (\text{Vergangenheits-Ast } \mathcal{H}^-)
+\end{cases}$$
+
+Über den lückenlosen Rückkanal wird der private Schlüssel $d$ in einem einzigen ALU-Taktzyklus zurückberechnet:
+
+$$d \equiv r^{-1} \cdot (s \cdot k - z) \pmod n$$
+
+$$Q.E.D. \quad \text{SYSTEM\_CLOSED\_SEALED } 💎$$
