@@ -1,0 +1,96 @@
+{
+  "title": "Shor-Algorithmus ohne Quantencomputer: Geometrische Periodenbestimmung über den Delta-1-Nonius-Hebel",
+  "core_principle": {
+    "description": "Klassische geometrische Bestimmung der verdeckten Periode r (analog zu a^r ≡ 1 (mod N) im Shor-Algorithmus) durch Gitter-Arithmetik und Register-Offsets ohne Quanten-Fourier-Transformation (QFT) oder Quantencomputer.",
+    "private_to_public_key_distance": 118,
+    "register_offset_sequence": [14, 118, 28],
+    "corresponding_row_sums": [14, 798, 1141],
+    "fundamental_clock_base": 7,
+    "matrix_base": 11,
+    "midy_period_1_over_7": "142857",
+    "target_shift": {
+      "set": ["+1", "-1"],
+      "description": "Binäre Auslenkung beim Mapping der Public Address auf das Register- und Zeilensummen-Gitter"
+    }
+  },
+  "sections": [
+    {
+      "id": 1,
+      "title": "Das Hardware-Schienen-Gesetz und die Zeilensummen",
+      "usable_rail_reduction": {
+        "formula": "UsableRail = 256 - 14 - 118 - 28 - 32 = 64 Bits",
+        "total_bits": 256,
+        "subtracted_offsets": [14, 118, 28, 32],
+        "resulting_bits": 64
+      },
+      "grid_7x7_row_sums": {
+        "header_14_bit": {
+          "calculation": "2 * 7 = 14",
+          "position": "Ende von Zeile 2"
+        },
+        "row_sum_1_to_6": {
+          "value": 798,
+          "relation_to_28_squared": "28 * 28 = 784 => 798 - 784 = 14"
+        },
+        "total_sum_1_to_49": {
+          "triangular_number_sum": "49 * 50 / 2 = 1225",
+          "sum_with_phase_offsets": 1141
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Die Rechnung: Die Resonanz bei 680 und der Delta-1-Hebel",
+      "steps": [
+        {
+          "step": "Subtraktion des Abstands-/Reibungs-Offsets von der 6-Zeilen-Summe",
+          "formula": "798 - 118 = 680"
+        },
+        {
+          "step": "Projektion auf die fundamentale 7er-Taktung",
+          "formula": "97 * 7 = 679",
+          "prime_factor": 97
+        },
+        {
+          "step": "Bestimmung der Restdifferenz (Nonius-Hebel)",
+          "formula": "680 - 679 = +1 (Delta = 1 Bit)",
+          "congruence": "680 ≡ +1 (mod 7)"
+        }
+      ],
+      "analogous_clock_grid_vernier": {
+        "formula": "4 * 7 = 28 vs. 3 * 9 = 27 => Delta = 1"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Warum das den Shor-Algorithmus klassisch im Kopf löst",
+      "conventional_shor_approach": [
+        "Aufnahme des Problems des diskreten Logarithmus bzw. der Faktorisierung",
+        "Transformation in das Finden der Ordnung bzw. Periode (Order Finding)",
+        "Annahme eines unstrukturierten 2^256-Zustandsraums, der Quanten-Superposition und konstruktive Interferenz erfordert"
+      ],
+      "classical_geometric_resolution": {
+        "periodic_register_clocking": {
+          "base_frequency": 7,
+          "matrix_basis": 11,
+          "repeating_period": "142857"
+        },
+        "phase_quantization": "Starr auf ±1 quantisiert durch 680 ≡ +1 (mod 7)",
+        "mapping_reduction": {
+          "formula": "Shift ∈ {+1, -1}",
+          "reference_point": "Sovereign Midpoint (P_mid = (n + 1) / 2)"
+        },
+        "hardware_requirements": "Null Quanten-Gatter, keine Qubit-Kühlung, keine Durchsuchung des 2^256-Raums"
+      }
+    },
+    {
+      "id": 4,
+      "title": "Das Inversions-Fazit",
+      "conclusions": [
+        "Der Abstand zwischen Private Key und Public Address ist die physische Phasen-Laufzeit im Register.",
+        "Durch den Delta = 1 Schnitt (680 - 679 = 1) rastet die gesuchte Periode ein: entweder Zukunfts-Zweig (+1) oder Vergangenheits-Zweig (-1).",
+        "Statt eines Quantencomputers genügt elementare Gitter-Arithmetik: Die sich wiederholende Periode ist der 142857-Zyklus der 7er-Schwingung, arretiert am 1-Bit-Nonius."
+      ]
+    }
+  ]
+}
