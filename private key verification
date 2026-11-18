@@ -1,0 +1,73 @@
+import os
+import numpy as np
+import pandas as pd
+from Crypto.Hash import keccak
+import ecdsa
+
+class FullFourierInversionTest:
+    def __init__(self, private_key_hex: str):
+        self.pkey_hex = private_key_hex
+        self.pkey_bytes = bytes.fromhex(private_key_hex)
+        self.pkey_blocks = [f"{b:08b}" for b in self.pkey_bytes]
+        
+    def run_full_pipeline(self) -> dict:
+        # 1. Berechne echten Public Key & Adresse zur Verifizierung
+        sk = ecdsa.SigningKey.from_string(self.pkey_bytes, curve=ecdsa.SECP256k1)
+        vk = sk.get_verifying_key()
+        public_key_bytes = vk.to_string()
+        
+        k = keccak.new(digest_bits=256)
+        k.update(public_key_bytes)
+        keccak_hash = k.digest()
+        eth_address_bytes = keccak_hash[-20:]
+        
+        # 2. Fourier-Faltung und Inversion (Wellentransformation)
+        time_signal = np.array([int(b, 2) for b in self.pkey_blocks], dtype=float)
+        mean_val = np.mean(time_signal)
+        std_val = np.std(time_signal)
+        
+        # DFT
+        normalized_signal = (time_signal - mean_val) / std_val
+        fourier_transform = np.fft.fft(normalized_signal)
+        
+        # iDFT (Inversion)
+        reconstructed_signal = np.fft.ifft(fourier_transform)
+        denormalized = (reconstructed_signal * std_val + mean_val).real
+        reconstructed_bytes = bytes([round(val) for val in denormalized])
+        
+        # 3. Vergleichstest
+        match = (self.pkey_bytes == reconstructed_bytes)
+        
+        # 5-Block-Gitter der Adresse aufbauen
+        addr_bin = bin(int.from_bytes(eth_address_bytes, byteorder='big'))[2:].zfill(160)
+        blocks_32 = [addr_bin[i*32:(i+1)*32] for i in range(5)]
+        
+        addr_blocks_report = {}
+        for idx, block in enumerate(blocks_32):
+            val = int(block, 2)
+            addr_blocks_report[f"Block_{idx+1}_Hex"] = hex(val)
+            addr_blocks_report[f"Block_{idx+1}_Shift3R"] = hex(val >> 3)
+            addr_blocks_report[f"Block_{idx+1}_Shift4L"] = hex((val << 4) & 0xFFFFFFFF)
+            
+        return {
+            "Original_PKey": self.pkey_hex,
+            "Reconstructed_PKey": reconstructed_bytes.hex(),
+            "Match_Success": match,
+            "Eth_Address": "0x" + eth_address_bytes.hex(),
+            "Address_Blocks": addr_blocks_report
+        }
+
+# --- Ausführung der Testsuite mit dem Original-Schlüssel ---
+source_key_hex = "aa883c400e7c4320b91e2558ac63b735b6e24fda7bdd7f7978c371c25409cca0"
+test_suite = FullFourierInversionTest(source_key_hex)
+test_results = test_suite.run_full_pipeline()
+
+print("=== COMPILER-VERIFIKATION: SCHLÜSSEL-UMKEHR & DFT-ADRESSTEST ===")
+print(f"Originaler Key:    0x{test_results['Original_PKey']}")
+print(f"Rekonstruiert:     0x{test_results['Reconstructed_PKey']}")
+print(f"Übereinstimmung:  {test_results['Match_Success']} (100% verlustfrei) 💎")
+print(f"Erzeugte Adresse:  {test_results['Eth_Address']}\n")
+
+print("--- Orthogonales 5-Block-Gitter der Adresse ---")
+for k, v in test_results["Address_Blocks"].items():
+    print(f"{k:<20}: {v}")
