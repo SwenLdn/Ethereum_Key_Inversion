@@ -1,0 +1,25 @@
+=== COMPILER-VERIFIKATION: FORMALES SYMMETRIE- UND PHASENMODELL ===
+0
+System	1/7
+Periodenlaenge_2n	6
+Halbzeit_n	3
+Teil_A	142
+Teil_B	857
+Midy_Summe	999
+Symmetrie_Validiert	True
+
+0
+System	1/49
+Periodenlaenge_2n	42
+Halbzeit_n	21
+Teil_A	020408163265306122448
+Teil_B	979591836734693877551
+Midy_Summe_Dezimal	999999999999999999999
+Symmetrie_Validiert	True
+0
+System	Binär-Register (b=2)
+Register_A_Bin	0b10101010
+Register_B_Bin	0b1010101
+Summe_A_plus_B_Bin	0b11111111
+Mersenne_Sperre_Dezimal	255
+Is_NOT_Complement_True	True
