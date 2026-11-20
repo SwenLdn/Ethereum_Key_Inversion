@@ -1,0 +1,32 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_modulo_ring(modulus, step=1):
+    """Visualisiert die Sprünge auf einem Modulo-Ring."""
+    angles = np.linspace(0, 2 * np.pi, modulus, endpoint=False)
+    x = np.cos(angles)
+    y = np.sin(angles)
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.plot(x, y, 'o', color='navy', markersize=10, label='Residuenklassen')
+
+    # Zeichne die Sprünge
+    current = 0
+    for _ in range(modulus + 1):
+        next_node = (current + step) % modulus
+        ax.annotate('', xy=(x[next_node], y[next_node]), xytext=(x[current], y[current]),
+                    arrowprops=dict(arrowstyle="->", color='crimson', lw=1.5, mutation_scale=15))
+        current = next_node
+
+    for i in range(modulus):
+        ax.text(x[i] * 1.2, y[i] * 1.2, f"{i}", fontsize=12, ha='center', va='center')
+
+    ax.set_title(f"Zyklische Gruppe Z_{modulus} mit Schrittweite {step}")
+    ax.set_xlim(-1.5, 1.5)
+    ax.set_ylim(-1.5, 1.5)
+    ax.set_aspect('equal')
+    ax.grid(True, linestyle=':', alpha=0.5)
+    plt.show()
+
+# Visualisiere den 7er-Ring, der mit der Midy-Sequenz assoziiert ist
+plot_modulo_ring(modulus=7, step=3)
